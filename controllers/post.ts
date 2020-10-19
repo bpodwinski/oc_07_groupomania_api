@@ -10,7 +10,6 @@ export default class PostController {
   public async getPost(req: Request, res: Response, next: NextFunction) {
     try {
       const post: any = await Post.findAll();
-      console.log(JSON.parse(JSON.stringify(post)));
       res.status(200).json(post);
     } catch (error) {
       next(error);
@@ -22,6 +21,10 @@ export default class PostController {
     try {
       const id: number = parseInt(req.params.id);
       const post: any = await Post.findByPk(id);
+
+      if (!post) {
+        throw new Error(404, "Not found");
+      }
 
       res.status(200).json(post);
     } catch (error) {
