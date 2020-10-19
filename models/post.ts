@@ -26,10 +26,12 @@ export default class post extends Model<post> {
   userID!: number;
   @BelongsTo(() => user) user!: user;
 
+  @AllowNull(false)
   @Length({ min: 3, max: 128 })
   @Column
   title!: string;
 
+  @AllowNull(false)
   @Length({ min: 3, max: 128 })
   @Column
   description!: string;
