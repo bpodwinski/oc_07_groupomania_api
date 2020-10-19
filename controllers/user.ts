@@ -73,7 +73,7 @@ export default class UserController {
           service: req.body.service,
           email: req.body.email,
           password: bcrypt.hashSync(req.body.password, 10),
-          avatar: req.file.filename,
+          //avatar: req.file.filename,
         });
         res.status(201).json(user);
       }
@@ -98,12 +98,24 @@ export default class UserController {
         res.status(200).json({
           userId: user.id,
           token: jwt.sign({ userId: user.id }, config.TOKEN, {
-            expiresIn: "24h",
+            expiresIn: "1h",
           }),
         });
       } else {
         throw new Error(401, "Passwords don't match");
       }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Logout
+  public async userLogout(req: Request, res: Response, next: NextFunction) {
+    try {
+      let token: string = req.cookies.token;
+      if (!token) return res.send({ token: null });
+
+      return res.clearCookie("token");
     } catch (error) {
       next(error);
     }

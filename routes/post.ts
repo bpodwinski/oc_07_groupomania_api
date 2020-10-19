@@ -20,6 +20,7 @@ export default class PostRoute {
   public initRoutes() {
     this.router.get("/post", this.auth, this.post.getPost);
     this.router.get("/post/:id", this.auth, this.post.getPostById);
+    this.router.delete("/post/:id", this.auth, this.post.deletePost);
     this.router.post("/post", this.auth, this.multer, this.post.createPost);
   }
 }

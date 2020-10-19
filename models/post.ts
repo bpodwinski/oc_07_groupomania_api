@@ -16,15 +16,15 @@ import {
   DataType,
 } from "sequelize-typescript";
 
-import User from "./user";
+import user from "./user";
 
 @Table
-export default class Post extends Model<Post> {
-  @ForeignKey(() => User)
+export default class post extends Model<post> {
+  @ForeignKey(() => user)
   @AllowNull(false)
   @Column
   userID!: number;
-  @BelongsTo(() => User) user!: User;
+  @BelongsTo(() => user) user!: user;
 
   @Length({ min: 3, max: 128 })
   @Column
@@ -38,8 +38,8 @@ export default class Post extends Model<Post> {
   @Column
   text!: string;
 
-  @Column
-  image!: string;
+  //@Column
+  //image!: string;
 
   @CreatedAt
   @Column

@@ -17,6 +17,7 @@ export default class UserRoute {
 
   public initRoutes() {
     this.router.post("/auth/login", this.user.userLogin);
+    this.router.post("/auth/logout", this.user.userLogout);
     this.router.post("/auth/register", this.multer, this.user.userRegister);
   }
 }

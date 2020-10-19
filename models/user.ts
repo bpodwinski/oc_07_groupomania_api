@@ -16,12 +16,12 @@ import {
   DataType,
 } from "sequelize-typescript";
 
-import Post from "./post";
+import post from "./post";
 
 @Table
-export default class User extends Model<User> {
-  @HasMany(() => Post)
-  posts!: Post[];
+export default class user extends Model<user> {
+  @HasMany(() => post)
+  posts!: post[];
 
   @AllowNull(false)
   @Length({ min: 3, max: 64 })
@@ -47,8 +47,8 @@ export default class User extends Model<User> {
   @Column
   password!: string;
 
-  @Column
-  avatar!: string;
+  //@Column
+  //avatar!: string;
 
   @AllowNull(false)
   @Length({ max: 64 })

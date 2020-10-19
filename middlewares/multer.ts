@@ -21,7 +21,7 @@ class Multer {
 
   private storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, "../public/img/avatar");
+      cb(null, "./img");
     },
     filename: (req: any, file: any, cb: any) => {
       const basename: string = path.basename(

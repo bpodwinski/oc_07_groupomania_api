@@ -10,6 +10,7 @@ export default class PostController {
   public async getPost(req: Request, res: Response, next: NextFunction) {
     try {
       const post: any = await Post.findAll();
+      console.log(JSON.parse(JSON.stringify(post)));
       res.status(200).json(post);
     } catch (error) {
       next(error);
@@ -21,6 +22,7 @@ export default class PostController {
     try {
       const id: number = parseInt(req.params.id);
       const post: any = await Post.findByPk(id);
+
       res.status(200).json(post);
     } catch (error) {
       next(error);
@@ -34,10 +36,31 @@ export default class PostController {
         title: req.body.title,
         description: req.body.description,
         text: req.body.text,
-        image: req.file.filename,
-        userID: 1,
+        //image: req.file.filename,
+        userID: req.body.userID,
       });
       res.status(201).json(post);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Delete a post
+  public async deletePost(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id: number = parseInt(req.params.id);
+      const post: any = await Post.findByPk(id);
+
+      if (!post) {
+        throw new Error(404, "Not found");
+      }
+
+      const deletePost: any = await Post.destroy({
+        where: {
+          id: id,
+        },
+      });
+      res.status(204).json(deletePost);
     } catch (error) {
       next(error);
     }
