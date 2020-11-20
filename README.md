@@ -16,7 +16,7 @@ Renommer .env.development.example en .env.development
 Fichier production:
 Renommer .env.production.example en .env.production
 
-## Mode développement
+### Mode développement
 
 ```
 npm run dev
