@@ -1,23 +1,36 @@
+import conf from "./utils/config";
+
 import AppError from "./middlewares/error";
-import * as config from "./config/config";
 import { Sequelize } from "sequelize-typescript";
 import * as express from "express";
 import * as path from "path";
 
 export default class App {
   public app: express.Application;
-  public host: string;
+  public host :string;
   public port: number;
+  public db_name: string;
+  public db_host: string;
+  public db_user: string;
+  public db_pass: string;
 
   constructor(appInit: {
     host: string;
     port: number;
+    db_name: string;
+    db_host: string;
+    db_user: string;
+    db_pass: string;
     middlewares: any;
     routes: any;
   }) {
     this.app = express();
     this.host = appInit.host;
     this.port = appInit.port;
+    this.db_name = appInit.db_name;
+    this.db_host = appInit.db_host;
+    this.db_user = appInit.db_user;
+    this.db_pass = appInit.db_pass;
 
     this.db();
     this.options();
@@ -42,10 +55,10 @@ export default class App {
 
   private db() {
     const sequelize = new Sequelize({
-      database: config.DB_NAME,
-      host: config.DB_HOST,
-      username: config.DB_USER,
-      password: config.DB_PASS,
+      database: this.db_name,
+      host: this.db_host,
+      username: this.db_user,
+      password: this.db_pass,
       dialect: "mysql",
       storage: "mysql",
       models: [__dirname + "/models/**/*.ts"],
@@ -64,7 +77,7 @@ export default class App {
 
   public listen() {
     this.app.listen(this.port, this.host, () => {
-      console.log(`App listening on the http://${this.host}:${this.port}`);
+      console.log(`Environment ${process.env.NODE_ENV} -> ${conf.APP_NAME} listening on the http://${this.host}:${this.port}`);
     });
   }
 }

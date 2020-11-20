@@ -7,13 +7,10 @@ if (process.env.NODE_ENV === "development") {
         watch: false,
         time: false,
         log_file: "var/log/api_dev.log",
-        env: {
-          PORT: 3000,
-        },
       },
     ],
   };
-} else {
+} else if (process.env.NODE_ENV === "production") {
   module.exports = {
     apps: [
       {
@@ -22,9 +19,6 @@ if (process.env.NODE_ENV === "development") {
         watch: false,
         time: true,
         log_file: "var/log/api.log",
-        env_production: {
-          PORT: 3000,
-        },
       },
     ],
   };

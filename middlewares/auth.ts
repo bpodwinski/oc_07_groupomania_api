@@ -1,9 +1,10 @@
+import conf from "../utils/config";
+
 import { Request, Response, NextFunction } from "express";
 
 import Error from "../exceptions/app";
 import AuthError from "../exceptions/auth";
 
-import * as config from "../config/config";
 import * as jwt from "jsonwebtoken";
 
 export default class Auth {
@@ -14,7 +15,7 @@ export default class Auth {
 
       if (token === null) throw new Error(401, "There isn't token");
 
-      const decodedToken: any = jwt.verify(token, config.TOKEN);
+      const decodedToken: any = jwt.verify(token, conf.TOKEN);
       const userId: string = decodedToken.userId;
 
       if (req.body.userId && req.body.userId !== userId) {

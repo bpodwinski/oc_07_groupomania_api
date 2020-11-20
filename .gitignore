@@ -1,5 +1,7 @@
 *.zip
 *.log
+.env.development
+.env.production
 package-lock.json
 node_modules/
 dist/
