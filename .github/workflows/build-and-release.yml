@@ -23,6 +23,7 @@ jobs:
     - run: chmod +x utils/scripts/*
     - run: npm i
     - run: npm run build
+    - run: cp package.json ./dist
     - run: zip -r release.zip ./dist
       
     - name: Create Release
