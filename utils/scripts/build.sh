@@ -14,4 +14,7 @@ tsc --build
 sleep 1
 
 # copy the files
-cp utils/.env.production dist/utils/
+if [ -f utils/.env.production ]
+then
+    cp utils/.env.production dist/utils/
+fi
