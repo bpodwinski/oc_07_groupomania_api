@@ -1,9 +1,7 @@
-import { env } from "../utils/env";
 import Error from "../exceptions/app";
 
 import { Request, Response, NextFunction } from "express";
 import * as bcrypt from "bcrypt";
-import * as jwt from "jsonwebtoken";
 
 // Routes import
 import User from "../models/user";
@@ -49,6 +47,30 @@ export default class UserController {
           },
         ],
       });
+      res.status(200).json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Update user informations
+  public async updateUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id: number = parseInt(req.params.id);
+      const user: any = await User.update(
+        {
+          firstname: req.body.firstname,
+          lastname: req.body.lastname,
+          service: req.body.service,
+          email: req.body.email,
+          password: bcrypt.hashSync(req.body.password, 10),
+        },
+        {
+          where: {
+            id: id,
+          },
+        }
+      );
       res.status(200).json(user);
     } catch (error) {
       next(error);
