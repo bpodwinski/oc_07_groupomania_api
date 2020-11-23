@@ -3,7 +3,7 @@ name: Build and Upload Release Asset
 on:
   create:
     tags:
-      - "*"
+      - "v*"
 
 jobs:
   build:
