@@ -61,7 +61,7 @@ export default class App {
       password: this.db_pass,
       dialect: "mysql",
       storage: "mysql",
-      models: [__dirname + "/models/**/*.ts"],
+      models: [__dirname + "/models"],
     });
 
     sequelize.sync({ force: false });
