@@ -1,6 +1,6 @@
 {
   "name": "groupomania_api",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "API du réseau social interne pour les employés de Groupomania",
   "main": "server.js",
   "scripts": {
