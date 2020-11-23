@@ -1,7 +1,7 @@
-name: Build and Upload Release Asset
+name: Build and Release
 
 on:
-  create:
+  push:
     tags:
       - "v*"
 
@@ -16,7 +16,7 @@ jobs:
     steps:
     - name: Get tag name
       id: tag_name
-      uses: olegtarasov/get-tag@v2
+      uses: little-core-labs/get-git-tag@v3.0.2
 
     - name: Checkout V2
       uses: actions/checkout@v2
@@ -25,11 +25,11 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: chmod +x utils/scripts/*
-    - run: npm i
-    - run: npm run build
-    - run: cp package.json ./dist
-    - run: zip -r release.zip ./dist
+      run: |
+        chmod +x utils/scripts/*
+        npm i
+        npm run build
+        zip -r release.zip ./dist
       
     - name: Create Release
       id: create_release
