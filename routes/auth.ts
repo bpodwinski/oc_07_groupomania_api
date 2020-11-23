@@ -4,11 +4,11 @@ import * as express from "express";
 import MulterMiddleware from "../middlewares/multer";
 
 // Controllers import
-import UserController from "../controllers/user";
+import AuthController from "../controllers/auth";
 
 export default class UserRoute {
   public router = express.Router();
-  public user = new UserController();
+  public auth = new AuthController();
   public multer = MulterMiddleware;
 
   constructor() {
@@ -16,8 +16,8 @@ export default class UserRoute {
   }
 
   public initRoutes() {
-    this.router.post("/auth/login", this.user.userLogin);
-    this.router.post("/auth/logout", this.user.userLogout);
-    this.router.post("/auth/register", this.multer, this.user.userRegister);
+    this.router.post("/auth/login", this.auth.userLogin);
+    this.router.post("/auth/logout", this.auth.userLogout);
+    this.router.post("/auth/register", this.multer, this.auth.userRegister);
   }
 }
