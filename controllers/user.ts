@@ -1,10 +1,9 @@
-import conf from "../utils/config";
+import { env } from "../utils/env";
+import Error from "../exceptions/app";
 
 import { Request, Response, NextFunction } from "express";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
-
-import Error from "../exceptions/app";
 
 // Routes import
 import User from "../models/user";
@@ -98,7 +97,7 @@ export default class UserController {
       if (bcrypt.compareSync(req.body.password, user.password)) {
         res.status(200).json({
           userId: user.id,
-          token: jwt.sign({ userId: user.id }, conf.TOKEN, {
+          token: jwt.sign({ userId: user.id }, env.TOKEN, {
             expiresIn: "1h",
           }),
         });

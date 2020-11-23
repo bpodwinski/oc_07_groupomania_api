@@ -1,4 +1,4 @@
-import conf from "./utils/config";
+import { env } from "./utils/env";
 import App from "./app";
 import * as bodyParser from "body-parser";
 
@@ -11,12 +11,12 @@ import UserRoute from "./routes/user";
 import PostRoute from "./routes/post";
 
 const app: any = new App({
-  host: conf.HOST,
-  port: conf.PORT,
-  db_name: conf.DB_NAME,
-  db_host: conf.DB_HOST,
-  db_user: conf.DB_USER,
-  db_pass: conf.DB_PASS,
+  host: env.HOST,
+  port: env.PORT,
+  db_name: env.DB_NAME,
+  db_host: env.DB_HOST,
+  db_user: env.DB_USER,
+  db_pass: env.DB_PASS,
   middlewares: [
     new CorsMiddleware().cors,
     bodyParser.json(),

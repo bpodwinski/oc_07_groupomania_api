@@ -1,8 +1,9 @@
+import { env } from "../utils/env";
 import * as cors from "cors";
 
 export default class Cors {
   public cors = cors({
-    origin: process.env.CORS_URL,
+    origin: env.CORS_URL,
     credentials: true,
     methods: "GET,PUT,POST,DELETE",
     allowedHeaders:

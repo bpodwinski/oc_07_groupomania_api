@@ -3,7 +3,7 @@ if (process.env.NODE_ENV === "development") {
     apps: [
       {
         name: "api_dev",
-        script: "tsnd --respawn -- server.ts",
+        script: "tsnd --respawn -- index.ts",
         watch: false,
         time: false,
         log_file: "var/log/api_dev.log",
@@ -15,7 +15,7 @@ if (process.env.NODE_ENV === "development") {
     apps: [
       {
         name: "api",
-        script: "node dist/server.js",
+        script: "node dist/index.js",
         watch: false,
         time: true,
         log_file: "var/log/api.log",

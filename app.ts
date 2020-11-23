@@ -1,4 +1,4 @@
-import conf from "./utils/config";
+import { env } from "./utils/env";
 
 import AppError from "./middlewares/error";
 import { Sequelize } from "sequelize-typescript";
@@ -7,7 +7,7 @@ import * as path from "path";
 
 export default class App {
   public app: express.Application;
-  public host :string;
+  public host: string;
   public port: number;
   public db_name: string;
   public db_host: string;
@@ -77,7 +77,9 @@ export default class App {
 
   public listen() {
     this.app.listen(this.port, this.host, () => {
-      console.log(`Environment ${process.env.NODE_ENV} -> ${conf.APP_NAME} listening on the http://${this.host}:${this.port}`);
+      console.log(
+        `Environment ${process.env.NODE_ENV} -> ${env.APP_NAME} listening on the http://${this.host}:${this.port}`
+      );
     });
   }
 }
