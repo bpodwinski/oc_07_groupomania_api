@@ -1,10 +1,9 @@
 name: Build and Upload Release Asset
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+  create:
+    tags:
+      - "*"
 
 jobs:
   build:
@@ -15,7 +14,13 @@ jobs:
         node-version: [12.x]
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Get tag name
+      id: tag_name
+      uses: olegtarasov/get-tag@v2
+
+    - name: Checkout V2
+      uses: actions/checkout@v2
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
@@ -32,8 +37,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: 1.0.0
-        release_name: Release
+        tag_name: ${{ steps.tag_name.outputs.tag }}
+        release_name: ${{ steps.tag_name.outputs.tag }}
         draft: false
         prerelease: false
       
