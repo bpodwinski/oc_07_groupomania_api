@@ -16,5 +16,6 @@ sleep 1
 # copy the files
 if [ -f utils/.env.production ]
 then
-    cp utils/.env.production dist/utils/
+    cp utils/.env.production.example dist/utils/ && \
+    cp package.json dist/
 fi
