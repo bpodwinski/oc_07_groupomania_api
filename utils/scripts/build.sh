@@ -14,8 +14,5 @@ tsc --build
 sleep 1
 
 # copy the files
-if [ -f utils/.env.production ]
-then
-    cp utils/.env.production.example dist/utils/ && \
-    cp package.json dist/
-fi
+cp utils/.env.production.example dist/utils/ && \
+cp package.json dist/
