@@ -37,7 +37,9 @@ export default class post extends Model<post> {
   description!: string;
 
   @AllowNull(false)
-  @Column
+  @Column({
+    type: DataType.TEXT({ length: "long" }),
+  })
   text!: string;
 
   //@Column
