@@ -29,30 +29,6 @@ export default class UserController {
     }
   }
 
-  // Get one user and posts by ID
-  public async getUserPostById(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
-    try {
-      const id: number = parseInt(req.params.id);
-      const user: any = await User.findAll({
-        where: {
-          id: id,
-        },
-        include: [
-          {
-            model: Post,
-          },
-        ],
-      });
-      res.status(200).json(user);
-    } catch (error) {
-      next(error);
-    }
-  }
-
   // Update user informations
   public async updateUser(req: Request, res: Response, next: NextFunction) {
     try {

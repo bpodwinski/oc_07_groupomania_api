@@ -16,6 +16,21 @@ export default class PostController {
     }
   }
 
+  // Get all posts by user
+  public async getPostByUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id: number = parseInt(req.params.id);
+      const post: any = await Post.findAll({
+        where: {
+          userID: id,
+        },
+      });
+      res.status(200).json(post);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   // Get one post by ID
   public async getPostById(req: Request, res: Response, next: NextFunction) {
     try {

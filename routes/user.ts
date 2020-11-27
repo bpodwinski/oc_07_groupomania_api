@@ -19,6 +19,5 @@ export default class UserRoute {
     this.router.get("/user", this.auth, this.user.getUser);
     this.router.get("/user/:id", this.auth, this.user.getUserById);
     this.router.post("/user/:id", this.auth, this.user.updateUser);
-    this.router.get("/user/:id/post", this.auth, this.user.getUserPostById);
   }
 }
