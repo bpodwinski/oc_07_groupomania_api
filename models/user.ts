@@ -16,9 +16,12 @@ import {
   DataType,
 } from "sequelize-typescript";
 
+import { env } from "../utils/env";
 import post from "./post";
 
-@Table
+@Table({
+  tableName: env.DB_PREFIX + "user",
+})
 export default class user extends Model<user> {
   @HasMany(() => post)
   posts!: post[];

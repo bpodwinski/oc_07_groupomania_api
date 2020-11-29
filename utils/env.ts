@@ -1,7 +1,7 @@
 import { EnvType, load } from "ts-dotenv";
-
 export type Env = EnvType<typeof schema>;
 export let env: Env;
+
 let path: string;
 
 export const schema = {
@@ -15,6 +15,7 @@ export const schema = {
   DB_NAME: String,
   DB_USER: String,
   DB_PASS: String,
+  DB_PREFIX: String,
 };
 
 // select the good env config file based on env environment process
@@ -31,4 +32,8 @@ switch (process.env.NODE_ENV) {
 
 export function initEnv(): void {
   env = load(schema, path);
+
+  if (env.DB_PREFIX) {
+    env.DB_PREFIX = env.DB_PREFIX + "_";
+  }
 }

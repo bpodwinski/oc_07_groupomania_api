@@ -16,9 +16,12 @@ import {
   DataType,
 } from "sequelize-typescript";
 
+import { env } from "../utils/env";
 import user from "./user";
 
-@Table
+@Table({
+  tableName: env.DB_PREFIX + "post",
+})
 export default class post extends Model<post> {
   @ForeignKey(() => user)
   @AllowNull(false)
@@ -41,9 +44,6 @@ export default class post extends Model<post> {
     type: DataType.TEXT({ length: "long" }),
   })
   text!: string;
-
-  //@Column
-  //image!: string;
 
   @CreatedAt
   @Column
