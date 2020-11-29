@@ -9,6 +9,7 @@ import CorsMiddleware from "./middlewares/cors";
 import AuthRoute from "./routes/auth";
 import UserRoute from "./routes/user";
 import PostRoute from "./routes/post";
+import CommentRoute from "./routes/comment";
 
 const app: any = new App({
   host: env.HOST,
@@ -22,7 +23,12 @@ const app: any = new App({
     bodyParser.json(),
     bodyParser.urlencoded({ extended: true }),
   ],
-  routes: [new AuthRoute(), new UserRoute(), new PostRoute()],
+  routes: [
+    new AuthRoute(),
+    new UserRoute(),
+    new PostRoute(),
+    new CommentRoute(),
+  ],
 });
 
 app.listen();
