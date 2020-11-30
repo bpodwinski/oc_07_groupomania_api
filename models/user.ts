@@ -18,6 +18,7 @@ import {
 
 import { env } from "../utils/env";
 import post from "./post";
+import comment from "./comment";
 
 @Table({
   tableName: env.DB_PREFIX + "user",
@@ -25,6 +26,9 @@ import post from "./post";
 export default class user extends Model<user> {
   @HasMany(() => post)
   posts!: post[];
+
+  @HasMany(() => comment)
+  comments!: comment[];
 
   @AllowNull(false)
   @Length({ min: 3, max: 64 })
