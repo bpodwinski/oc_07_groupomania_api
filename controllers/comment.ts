@@ -1,21 +1,12 @@
 import { Request, Response, NextFunction } from "express";
+import { Model } from "sequelize/types";
 
 import Error from "../exceptions/app";
 
-// Routes import
+// Models import
 import Comment from "../models/comment";
 
 export default class CommentController {
-  // Get all comments
-  public async getComment(req: Request, res: Response, next: NextFunction) {
-    try {
-      const comment: any = await Comment.findAll();
-      res.status(200).json(comment);
-    } catch (error) {
-      next(error);
-    }
-  }
-
   // Get all comments by user
   public async getCommentByUser(
     req: Request,
@@ -55,8 +46,8 @@ export default class CommentController {
   public async createComment(req: Request, res: Response, next: NextFunction) {
     try {
       const comment: any = await Comment.create({
-        postID: req.body.postID,
         userID: req.body.userID,
+        postID: req.body.postID,
         text: req.body.text,
       });
       res.status(201).json(comment);
