@@ -1,15 +1,46 @@
 import { Request, Response, NextFunction } from "express";
+import { Model } from "sequelize/types";
 
 import Error from "../exceptions/app";
 
-// Routes import
+// Models import
 import Post from "../models/post";
+import User from "../models/user";
+import Comment from "../models/comment";
 
 export default class PostController {
   // Get all posts
   public async getPost(req: Request, res: Response, next: NextFunction) {
     try {
-      const post: any = await Post.findAll();
+      const post: any = await Post.findAll({
+        include: [
+          {
+            model: User,
+            attributes: [
+              "id",
+              "firstname",
+              "lastname",
+              "createdAt",
+              "updatedAt",
+            ],
+          },
+          {
+            model: Comment,
+            include: [
+              {
+                model: User,
+                attributes: [
+                  "id",
+                  "firstname",
+                  "lastname",
+                  "createdAt",
+                  "updatedAt",
+                ],
+              },
+            ],
+          },
+        ],
+      });
       res.status(200).json(post);
     } catch (error) {
       next(error);
