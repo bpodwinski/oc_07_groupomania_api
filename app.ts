@@ -3,16 +3,24 @@ import { env } from "./utils/env";
 import AppError from "./middlewares/error";
 import { Sequelize } from "sequelize-typescript";
 import * as express from "express";
+import * as cache from "cache-all/redis";
 import * as path from "path";
 
 export default class App {
   public app: express.Application;
+  public cache: void;
   public host: string;
   public port: number;
   public db_name: string;
   public db_host: string;
   public db_user: string;
   public db_pass: string;
+  public redis_db: string | undefined;
+  public redis_port: number;
+  public redis_host: string;
+  public redis_pass: string | undefined;
+  public redis_prefix: string | undefined;
+  public cache_ttl: number;
 
   constructor(appInit: {
     host: string;
@@ -21,6 +29,12 @@ export default class App {
     db_host: string;
     db_user: string;
     db_pass: string;
+    redis_db: string | undefined;
+    redis_port: number;
+    redis_host: string;
+    redis_pass: string | undefined;
+    redis_prefix: string | undefined;
+    cache_ttl: number;
     middlewares: any;
     routes: any;
   }) {
@@ -31,12 +45,33 @@ export default class App {
     this.db_host = appInit.db_host;
     this.db_user = appInit.db_user;
     this.db_pass = appInit.db_pass;
+    this.redis_db = appInit.redis_db;
+    this.redis_port = appInit.redis_port;
+    this.redis_host = appInit.redis_host;
+    this.redis_pass = appInit.redis_pass;
+    this.redis_prefix = appInit.redis_prefix;
+    this.cache_ttl = appInit.cache_ttl;
 
+    this.cacheRoutes();
     this.db();
     this.options();
     this.middlewares(appInit.middlewares);
     this.routes(appInit.routes);
     this.handlerError();
+  }
+
+  private cacheRoutes() {
+    cache.init({
+      ttl: this.cache_ttl,
+      isEnable: true,
+      redis: {
+        port: this.redis_port,
+        host: this.redis_host,
+        password: this.redis_pass,
+        database: this.redis_db,
+        prefix: this.redis_prefix,
+      },
+    });
   }
 
   private middlewares(middlewares: {

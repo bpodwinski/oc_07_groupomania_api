@@ -16,6 +16,21 @@ export const schema = {
   DB_USER: String,
   DB_PASS: String,
   DB_PREFIX: String,
+  REDIS_HOST: String,
+  REDIS_PORT: Number,
+  REDIS_DB: {
+    type: String,
+    optional: true,
+  },
+  REDIS_PASS: {
+    type: String,
+    optional: true,
+  },
+  REDIS_PREFIX: {
+    type: String,
+    optional: true,
+  },
+  CACHE_TTL: Number,
 };
 
 // select the good env config file based on env environment process
@@ -35,5 +50,9 @@ export function initEnv(): void {
 
   if (env.DB_PREFIX) {
     env.DB_PREFIX = env.DB_PREFIX + "_";
+  }
+
+  if (env.REDIS_PREFIX) {
+    env.REDIS_PREFIX = env.REDIS_PREFIX + "_";
   }
 }

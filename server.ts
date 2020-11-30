@@ -18,6 +18,12 @@ const app: any = new App({
   db_host: env.DB_HOST,
   db_user: env.DB_USER,
   db_pass: env.DB_PASS,
+  redis_db: env.REDIS_DB,
+  redis_port: env.REDIS_PORT,
+  redis_host: env.REDIS_HOST,
+  redis_pass: env.REDIS_PASS,
+  redis_prefix: env.REDIS_PREFIX,
+  cache_ttl: env.CACHE_TTL,
   middlewares: [
     new CorsMiddleware().cors,
     bodyParser.json(),
