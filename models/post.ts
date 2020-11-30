@@ -18,11 +18,15 @@ import {
 
 import { env } from "../utils/env";
 import user from "./user";
+import comment from "./comment";
 
 @Table({
   tableName: env.DB_PREFIX + "post",
 })
 export default class post extends Model<post> {
+  @HasMany(() => comment)
+  comments!: comment[];
+
   @ForeignKey(() => user)
   @AllowNull(false)
   @Column
