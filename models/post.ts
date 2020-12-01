@@ -39,11 +39,6 @@ export default class post extends Model<post> {
   title!: string;
 
   @AllowNull(false)
-  @Length({ min: 3, max: 128 })
-  @Column
-  description!: string;
-
-  @AllowNull(false)
   @Column({
     type: DataType.TEXT({ length: "long" }),
   })
