@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { Model } from "sequelize/types";
+import * as cache from "cache-all/redis";
+import { env } from "../utils/env";
 
 import Error from "../exceptions/app";
 
@@ -12,36 +13,43 @@ export default class PostController {
   // Get all posts
   public async getPost(req: Request, res: Response, next: NextFunction) {
     try {
-      const post: any = await Post.findAll({
-        include: [
-          {
-            model: User,
-            attributes: [
-              "id",
-              "firstname",
-              "lastname",
-              "createdAt",
-              "updatedAt",
-            ],
-          },
-          {
-            model: Comment,
-            include: [
-              {
-                model: User,
-                attributes: [
-                  "id",
-                  "firstname",
-                  "lastname",
-                  "createdAt",
-                  "updatedAt",
-                ],
-              },
-            ],
-          },
-        ],
-      });
-      res.status(200).json(post);
+      const dataCached: Promise<any> = await cache.get("posts_all");
+
+      if (dataCached === null) {
+        const data = await Post.findAll({
+          include: [
+            {
+              model: User,
+              attributes: [
+                "id",
+                "firstname",
+                "lastname",
+                "createdAt",
+                "updatedAt",
+              ],
+            },
+            {
+              model: Comment,
+              include: [
+                {
+                  model: User,
+                  attributes: [
+                    "id",
+                    "firstname",
+                    "lastname",
+                    "createdAt",
+                    "updatedAt",
+                  ],
+                },
+              ],
+            },
+          ],
+        });
+        cache.set("posts_all", data, env.CACHE_TTL);
+        return res.status(200).json(data);
+      }
+
+      res.status(200).json(dataCached);
     } catch (error) {
       next(error);
     }
@@ -51,12 +59,19 @@ export default class PostController {
   public async getPostByUser(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const post: any = await Post.findAll({
-        where: {
-          userID: id,
-        },
-      });
-      res.status(200).json(post);
+      const dataCached: Promise<any> = await cache.get("post_user_" + id);
+
+      if (dataCached === null) {
+        const data = await Post.findAll({
+          where: {
+            userID: id,
+          },
+        });
+        cache.set("postuser_" + id, data, env.CACHE_TTL);
+        return res.status(200).json(data);
+      }
+
+      res.status(200).json(dataCached);
     } catch (error) {
       next(error);
     }
@@ -66,13 +81,15 @@ export default class PostController {
   public async getPostById(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const post: any = await Post.findByPk(id);
+      const dataCached: Promise<any> = await cache.get("post_" + id);
 
-      if (!post) {
-        throw new Error(404, "Not found");
+      if (dataCached === null) {
+        const data = await Post.findByPk(id);
+        cache.set("post_" + id, data, env.CACHE_TTL);
+        return res.status(200).json(data);
       }
 
-      res.status(200).json(post);
+      return res.status(200).json(dataCached);
     } catch (error) {
       next(error);
     }
@@ -88,6 +105,10 @@ export default class PostController {
         //image: req.file.filename,
         userID: req.body.userID,
       });
+
+      // Refresh the cache
+      cache.removeByPattern("posts_all");
+
       res.status(201).json(post);
     } catch (error) {
       next(error);
@@ -109,6 +130,10 @@ export default class PostController {
           id: id,
         },
       });
+
+      // Refresh the cache
+      cache.removeByPattern("posts_all");
+
       res.status(204).json(deletePost);
     } catch (error) {
       next(error);
