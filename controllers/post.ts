@@ -85,6 +85,11 @@ export default class PostController {
 
       if (dataCached === null) {
         const data = await Post.findByPk(id);
+
+        if (!data) {
+          throw new Error(404, "Not found");
+        }
+
         cache.set("post_" + id, data, env.CACHE_TTL);
         return res.status(200).json(data);
       }
