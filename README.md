@@ -10,12 +10,12 @@ Cloner le dépot et lancer la commande :
 npm install
 ```
 
-## Fichier de configuration
+## Configuration
 
-Fichier dev:
+Fichier de configuration dev :
 Renommer .env.development.example en .env.development
 
-Fichier production:
+Fichier de configuration production :
 Renommer .env.production.example en .env.production
 
 ### Environment variables
@@ -39,6 +39,14 @@ Renommer .env.production.example en .env.production
 | **REDIS_PASS**   | _optional_ | null            |
 | **REDIS_PREFIX** | _optional_ | gpm             |
 | **CACHE_TTL**    | _required_ | 3600            |
+
+### (Optionnel) Données d'exemple à importer dans la base SQL
+
+| Ordre | Fichier             | Type       | Nombre         |
+| ----- | ------------------- | ---------- | -------------- |
+|   1   | **gpm_user.sql**    | _optional_ | 10 users       |
+|   2   | **gpm_post.sql**    | _optional_ | 1000 posts     |
+|   3   | **gpm_comment.sql** | _optional_ | 5000 comments  |
 
 ### Mode développement
 
