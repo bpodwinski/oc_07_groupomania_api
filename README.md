@@ -42,6 +42,8 @@ Renommer .env.production.example en .env.production
 
 ### (Optionnel) Données d'exemple à importer dans la base SQL
 
+Dans le dossier utils :
+
 | Ordre | Fichier             | Type       | Nombre         |
 | ----- | ------------------- | ---------- | -------------- |
 |   1   | **gpm_user.sql**    | _optional_ | 10 users       |
