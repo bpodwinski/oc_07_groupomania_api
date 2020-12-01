@@ -1,9 +1,10 @@
-import { env } from "../utils/env";
-import Error from "../exceptions/app";
-
 import { Request, Response, NextFunction } from "express";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
+import * as cache from "cache-all/redis";
+import { env } from "../utils/env";
+
+import Error from "../exceptions/app";
 
 // Routes import
 import User from "../models/user";
@@ -12,16 +13,16 @@ export default class UserController {
   // Register
   public async userRegister(req: Request, res: Response, next: NextFunction) {
     try {
-      const getUserByEmail: any = await User.findOne({
+      const getUserByEmail = await User.findOne({
         where: {
           email: req.body.email,
         },
       });
 
-      if ((await getUserByEmail) != null) {
+      if (getUserByEmail != null) {
         throw new Error(401, "User already exists");
       } else {
-        const user: any = await User.create({
+        const data = await User.create({
           firstname: req.body.firstname,
           lastname: req.body.lastname,
           service: req.body.service,
@@ -29,7 +30,11 @@ export default class UserController {
           password: bcrypt.hashSync(req.body.password, 10),
           //avatar: req.file.filename,
         });
-        res.status(201).json(user);
+
+        // Refresh the cache
+        cache.removeByPattern("users_all");
+
+        return res.status(201).json(data);
       }
     } catch (error) {
       next(error);
