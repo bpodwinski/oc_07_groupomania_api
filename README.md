@@ -38,7 +38,7 @@ Renommer .env.production.example en .env.production
 | **REDIS_DB**     | _optional_ | 0               |
 | **REDIS_PASS**   | _optional_ | null            |
 | **REDIS_PREFIX** | _optional_ | gpm             |
-| **CACHE_TTL**    | _required_ | 120             |
+| **CACHE_TTL**    | _required_ | 3600            |
 
 ### Mode développement
 
