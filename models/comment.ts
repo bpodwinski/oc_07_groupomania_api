@@ -27,20 +27,21 @@ export default class comment extends Model<comment> {
   @ForeignKey(() => post)
   @AllowNull(false)
   @Column
-  postID!: number;
-  @BelongsTo(() => post) post!: post;
+  postId!: number;
+  @BelongsTo(() => post, { onDelete: "CASCADE" })
+  post!: post;
 
   @ForeignKey(() => user)
   @AllowNull(false)
   @Column
-  userID!: number;
+  userId!: number;
   @BelongsTo(() => user) user!: user;
 
   @AllowNull(false)
   @Column({
     type: DataType.TEXT({ length: "long" }),
   })
-  text!: string;
+  content!: string;
 
   @CreatedAt
   @Column

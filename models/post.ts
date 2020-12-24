@@ -17,21 +17,21 @@ import {
 } from "sequelize-typescript";
 
 import { env } from "../utils/env";
-import user from "./user";
-import comment from "./comment";
+import User from "./user";
+import Comment from "./comment";
 
 @Table({
   tableName: env.DB_PREFIX + "post",
 })
 export default class post extends Model<post> {
-  @HasMany(() => comment)
-  comments!: comment[];
+  @HasMany(() => Comment, { as: "comments" })
+  comments!: Comment[];
 
-  @ForeignKey(() => user)
+  @BelongsTo(() => User, { onDelete: "CASCADE" }) user!: User;
+  @ForeignKey(() => User)
   @AllowNull(false)
   @Column
-  userID!: number;
-  @BelongsTo(() => user) user!: user;
+  userId!: number;
 
   @AllowNull(false)
   @Length({ min: 3, max: 128 })
@@ -42,7 +42,7 @@ export default class post extends Model<post> {
   @Column({
     type: DataType.TEXT({ length: "long" }),
   })
-  text!: string;
+  content!: string;
 
   @CreatedAt
   @Column

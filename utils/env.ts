@@ -30,6 +30,7 @@ export const schema = {
     type: String,
     optional: true,
   },
+  CACHE_ENABLE: Boolean,
   CACHE_TTL: Number,
 };
 

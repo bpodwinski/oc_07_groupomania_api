@@ -19,17 +19,7 @@ export default class PostRoute {
 
   public initRoutes() {
     this.router.get("/comment/:id", this.auth, this.comment.getCommentById);
-    this.router.get(
-      "/comment/user/:id",
-      this.auth,
-      this.comment.getCommentByUser
-    );
     this.router.delete("/comment/:id", this.auth, this.comment.deleteComment);
-    this.router.post(
-      "/comment",
-      this.auth,
-      this.multer,
-      this.comment.createComment
-    );
+    this.router.post("/comment", this.auth, this.comment.createComment);
   }
 }

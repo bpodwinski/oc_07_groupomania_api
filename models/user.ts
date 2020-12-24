@@ -54,9 +54,6 @@ export default class user extends Model<user> {
   @Column
   password!: string;
 
-  //@Column
-  //avatar!: string;
-
   @AllowNull(false)
   @Length({ max: 64 })
   @Column

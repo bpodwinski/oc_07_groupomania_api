@@ -24,6 +24,7 @@ const app: any = new App({
   redis_pass: env.REDIS_PASS,
   redis_prefix: env.REDIS_PREFIX,
   cache_ttl: env.CACHE_TTL,
+  cache_enable: env.CACHE_ENABLE,
   middlewares: [
     new CorsMiddleware().cors,
     bodyParser.json(),

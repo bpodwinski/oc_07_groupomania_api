@@ -1,31 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import { Model } from "sequelize/types";
 
 import Error from "../exceptions/app";
 
 // Models import
 import Comment from "../models/comment";
+import User from "../models/user";
 
 export default class CommentController {
-  // Get all comments by user
-  public async getCommentByUser(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
-    try {
-      const id: number = parseInt(req.params.id);
-      const comment: any = await Comment.findAll({
-        where: {
-          userID: id,
-        },
-      });
-      res.status(200).json(comment);
-    } catch (error) {
-      next(error);
-    }
-  }
-
   // Get one comment by ID
   public async getCommentById(req: Request, res: Response, next: NextFunction) {
     try {
@@ -45,12 +26,22 @@ export default class CommentController {
   // Create a comment
   public async createComment(req: Request, res: Response, next: NextFunction) {
     try {
-      const comment: any = await Comment.create({
-        userID: req.body.userID,
-        postID: req.body.postID,
-        text: req.body.text,
+      const data: any = await Comment.create({
+        userId: parseInt(req.body.userId),
+        postId: parseInt(req.body.postId),
+        content: req.body.content,
       });
-      res.status(201).json(comment);
+
+      const dataResult = await Comment.findByPk(data.id, {
+        attributes: ["postId", "content", "createdAt", "updatedAt"],
+        include: [
+          {
+            model: User,
+            attributes: ["firstname", "lastname", "createdAt", "updatedAt"],
+          },
+        ],
+      });
+      res.status(201).json(dataResult);
     } catch (error) {
       next(error);
     }

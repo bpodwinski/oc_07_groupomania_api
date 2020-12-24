@@ -28,11 +28,11 @@ export default class UserController {
   public async getUserById(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const dataCached: Promise<any> = await cache.get("user_" + id);
+      const dataCached: Promise<any> = await cache.get("user/" + id);
 
       if (dataCached === null) {
         const data = await User.findByPk(id);
-        cache.set("user_" + id, data, env.CACHE_TTL);
+        cache.set("user/" + id, data, env.CACHE_TTL);
         return res.status(200).json(data);
       }
 

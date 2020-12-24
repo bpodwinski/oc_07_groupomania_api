@@ -21,6 +21,7 @@ export default class App {
   public redis_pass: string | undefined;
   public redis_prefix: string | undefined;
   public cache_ttl: number;
+  public cache_enable: boolean;
 
   constructor(appInit: {
     host: string;
@@ -35,6 +36,7 @@ export default class App {
     redis_pass: string | undefined;
     redis_prefix: string | undefined;
     cache_ttl: number;
+    cache_enable: boolean;
     middlewares: any;
     routes: any;
   }) {
@@ -51,6 +53,7 @@ export default class App {
     this.redis_pass = appInit.redis_pass;
     this.redis_prefix = appInit.redis_prefix;
     this.cache_ttl = appInit.cache_ttl;
+    this.cache_enable = appInit.cache_enable;
 
     this.cacheRoutes();
     this.db();
@@ -63,7 +66,7 @@ export default class App {
   private cacheRoutes() {
     cache.init({
       ttl: this.cache_ttl,
-      isEnable: true,
+      isEnable: this.cache_enable,
       redis: {
         port: this.redis_port,
         host: this.redis_host,

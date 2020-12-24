@@ -13,9 +13,9 @@ export default class Auth {
       if (token === null) throw new Error(401, "There isn't token");
 
       const decodedToken: any = jwt.verify(token, env.TOKEN);
-      const userId: string = decodedToken.userId;
+      const userId: number = decodedToken.userId;
 
-      if (req.body.userId && req.body.userId !== userId) {
+      if (parseInt(req.body.userId) && parseInt(req.body.userId) !== userId) {
         throw new Error(401, "Invalid user ID");
       } else {
         next();

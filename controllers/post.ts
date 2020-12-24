@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import * as cache from "cache-all/redis";
 import { env } from "../utils/env";
-
+const { Op } = require("sequelize");
 import Error from "../exceptions/app";
 
 // Models import
@@ -10,13 +10,25 @@ import User from "../models/user";
 import Comment from "../models/comment";
 
 export default class PostController {
-  // Get all posts
+  // Get posts
   public async getPost(req: Request, res: Response, next: NextFunction) {
     try {
-      const dataCached: Promise<any> = await cache.get("posts_all");
+      const page: number = parseInt(req.params.page);
+      const pageSize: number = 10;
+      const cacheKey: string = "posts/page/" + page;
+      const dataCached: Promise<any> = await cache.get(cacheKey);
 
       if (dataCached === null) {
-        const data = await Post.findAll({
+        const data = await Post.findAndCountAll({
+          limit: pageSize,
+          offset: page * pageSize,
+          // where: {
+          //   id: {
+          //     [Op.lte]: page * 10,
+          //   },
+          // },
+          order: [["id", "DESC"]],
+          attributes: ["id", "title", "content", "createdAt", "updatedAt"],
           include: [
             {
               model: User,
@@ -28,25 +40,35 @@ export default class PostController {
                 "updatedAt",
               ],
             },
-            {
-              model: Comment,
-              include: [
-                {
-                  model: User,
-                  attributes: [
-                    "id",
-                    "firstname",
-                    "lastname",
-                    "createdAt",
-                    "updatedAt",
-                  ],
-                },
-              ],
-            },
+            // {
+            //   model: Comment,
+            //   as: "comments",
+            //   attributes: ["id", "content", "createdAt", "updatedAt"],
+            //   include: [
+            //     {
+            //       model: User,
+            //       attributes: [
+            //         "firstname",
+            //         "lastname",
+            //         "createdAt",
+            //         "updatedAt",
+            //       ],
+            //     },
+            //   ],
+            // },
           ],
         });
-        cache.set("posts_all", data, env.CACHE_TTL);
-        return res.status(200).json(data);
+
+        const dataResult: object = {
+          page: page,
+          pageSize: pageSize,
+          total: data.count,
+          posts: data.rows,
+        };
+
+        cache.set(cacheKey, dataResult, env.CACHE_TTL);
+
+        return res.status(200).json(dataResult);
       }
 
       res.status(200).json(dataCached);
@@ -55,46 +77,31 @@ export default class PostController {
     }
   }
 
-  // Get all posts by user
-  public async getPostByUser(req: Request, res: Response, next: NextFunction) {
+  // Get post comments
+  public async getPostComment(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const dataCached: Promise<any> = await cache.get("post_user_" + id);
-
-      if (dataCached === null) {
-        const data = await Post.findAll({
-          where: {
-            userID: id,
+      const data: any = await Comment.findAndCountAll({
+        where: {
+          postID: id,
+        },
+        order: [["id", "DESC"]],
+        attributes: ["content", "createdAt", "updatedAt"],
+        include: [
+          {
+            model: User,
+            attributes: ["firstname", "lastname", "createdAt", "updatedAt"],
           },
-        });
-        cache.set("postuser_" + id, data, env.CACHE_TTL);
-        return res.status(200).json(data);
-      }
+        ],
+      });
 
-      res.status(200).json(dataCached);
-    } catch (error) {
-      next(error);
-    }
-  }
+      const dataResult: object = {
+        postID: id,
+        total: data.count,
+        comments: data.rows,
+      };
 
-  // Get one post by ID
-  public async getPostById(req: Request, res: Response, next: NextFunction) {
-    try {
-      const id: number = parseInt(req.params.id);
-      const dataCached: Promise<any> = await cache.get("post_" + id);
-
-      if (dataCached === null) {
-        const data = await Post.findByPk(id);
-
-        if (!data) {
-          throw new Error(404, "Not found");
-        }
-
-        cache.set("post_" + id, data, env.CACHE_TTL);
-        return res.status(200).json(data);
-      }
-
-      return res.status(200).json(dataCached);
+      res.status(200).json(dataResult);
     } catch (error) {
       next(error);
     }
@@ -104,17 +111,36 @@ export default class PostController {
   public async createPost(req: Request, res: Response, next: NextFunction) {
     try {
       const post: any = await Post.create({
+        userId: parseInt(req.body.userId),
         title: req.body.title,
-        description: req.body.description,
-        text: req.body.text,
-        //image: req.file.filename,
-        userID: req.body.userID,
+        content: req.body.content,
+      });
+
+      const data = await Post.findByPk(post.id, {
+        attributes: ["id", "title", "content", "createdAt", "updatedAt"],
+        include: [
+          {
+            model: User,
+            attributes: ["firstname", "lastname", "createdAt", "updatedAt"],
+          },
+          {
+            model: Comment,
+            as: "comments",
+            attributes: ["id", "content", "createdAt", "updatedAt"],
+            include: [
+              {
+                model: User,
+                attributes: ["firstname", "lastname", "createdAt", "updatedAt"],
+              },
+            ],
+          },
+        ],
       });
 
       // Refresh the cache
-      cache.removeByPattern("posts_all");
+      cache.removeByPattern("posts/page/");
 
-      res.status(201).json(post);
+      res.status(201).json(data);
     } catch (error) {
       next(error);
     }
@@ -137,7 +163,7 @@ export default class PostController {
       });
 
       // Refresh the cache
-      cache.removeByPattern("posts_all");
+      cache.removeByPattern("posts/page/");
 
       res.status(204).json(deletePost);
     } catch (error) {

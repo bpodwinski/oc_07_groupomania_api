@@ -19,22 +19,29 @@ export default class UserController {
         },
       });
 
-      if (getUserByEmail != null) {
+      if (getUserByEmail !== null) {
         throw new Error(401, "User already exists");
       } else {
-        const data = await User.create({
+        const createUser = await User.create({
           firstname: req.body.firstname,
           lastname: req.body.lastname,
           service: req.body.service,
           email: req.body.email,
           password: bcrypt.hashSync(req.body.password, 10),
-          //avatar: req.file.filename,
         });
+
+        const response: object = {
+          firstname: createUser.firstname,
+          lastname: createUser.lastname,
+          service: createUser.service,
+          email: createUser.email,
+          password: req.body.password,
+        };
 
         // Refresh the cache
         cache.removeByPattern("users_all");
 
-        return res.status(201).json(data);
+        return res.status(201).json(response);
       }
     } catch (error) {
       next(error);
@@ -51,17 +58,27 @@ export default class UserController {
         },
       });
       if (!user) {
-        throw new Error(401, "User not found");
+        return res.status(202).json({
+          httpStatus: 202,
+          type: 1,
+          message: "User not found",
+        });
       }
       if (bcrypt.compareSync(req.body.password, user.password)) {
-        res.status(200).json({
+        return res.status(200).json({
+          httpStatus: 200,
+          type: 0,
           userId: user.id,
           token: jwt.sign({ userId: user.id }, env.TOKEN, {
             expiresIn: "1h",
           }),
         });
       } else {
-        throw new Error(401, "Passwords don't match");
+        return res.status(202).json({
+          httpStatus: 202,
+          type: 2,
+          message: "Passwords don't match",
+        });
       }
     } catch (error) {
       next(error);
