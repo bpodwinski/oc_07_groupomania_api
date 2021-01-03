@@ -52,7 +52,7 @@ export default class UserController {
           lastname: req.body.lastname,
           service: req.body.service,
           email: req.body.email,
-          password: bcrypt.hashSync(req.body.password, 10),
+          //password: bcrypt.hashSync(req.body.password, 10),
         },
         {
           where: {
@@ -61,6 +61,21 @@ export default class UserController {
         }
       );
       res.status(200).json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Delete user
+  public async deleteUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user: any = await User.destroy({
+        where: {
+          id: req.params.id,
+        },
+      });
+
+      res.status(200).json({ message: user });
     } catch (error) {
       next(error);
     }

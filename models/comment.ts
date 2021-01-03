@@ -35,7 +35,7 @@ export default class comment extends Model<comment> {
   @AllowNull(false)
   @Column
   userId!: number;
-  @BelongsTo(() => user) user!: user;
+  @BelongsTo(() => user, { onDelete: "CASCADE" }) user!: user;
 
   @AllowNull(false)
   @Column({
