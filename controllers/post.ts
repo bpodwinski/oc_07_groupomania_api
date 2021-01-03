@@ -27,7 +27,7 @@ export default class PostController {
           //     [Op.lte]: page * 10,
           //   },
           // },
-          order: [["id", "DESC"]],
+          order: [["createdAt", "DESC"]],
           attributes: ["id", "title", "content", "createdAt", "updatedAt"],
           include: [
             {
@@ -85,7 +85,7 @@ export default class PostController {
         where: {
           postID: id,
         },
-        order: [["id", "DESC"]],
+        order: [["createdAt", "DESC"]],
         attributes: ["content", "createdAt", "updatedAt"],
         include: [
           {
