@@ -6,4 +6,4 @@ package-lock.json
 node_modules/
 dist/
 var/log
-img/
+var/uploads

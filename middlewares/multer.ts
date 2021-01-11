@@ -3,7 +3,7 @@ import Error from "../exceptions/app";
 import * as multer from "multer";
 import * as path from "path";
 
-class Multer {
+export default class Multer {
   private fileFilter = (req: any, file: any, cb: any) => {
     if (
       file.mimetype === "image/jpg" ||
@@ -21,7 +21,7 @@ class Multer {
 
   private storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, "./img");
+      cb(null, "./var/uploads");
     },
     filename: (req: any, file: any, cb: any) => {
       const basename: string = path.basename(
@@ -33,10 +33,8 @@ class Multer {
     },
   });
 
-  public init = multer({
+  public multer = multer({
     storage: this.storage,
     fileFilter: this.fileFilter,
   });
 }
-
-export default new Multer().init.single("img");

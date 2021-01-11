@@ -4,6 +4,7 @@ import * as bodyParser from "body-parser";
 
 // Middlewares import
 import CorsMiddleware from "./middlewares/cors";
+import MulterMiddleware from "./middlewares/multer";
 
 // Routes import
 import AuthRoute from "./routes/auth";
@@ -29,6 +30,7 @@ const app: any = new App({
     new CorsMiddleware().cors,
     bodyParser.json(),
     bodyParser.urlencoded({ extended: true }),
+    new MulterMiddleware().multer.single("image"),
   ],
   routes: [
     new AuthRoute(),

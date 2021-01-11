@@ -44,6 +44,9 @@ export default class post extends Model<post> {
   })
   content!: string;
 
+  @Column
+  imgUrl!: string;
+
   @CreatedAt
   @Column
   createdAt!: Date;

@@ -106,7 +106,10 @@ export default class App {
   }
 
   private options() {
-    this.app.use("/img", express.static(path.join(__dirname, "../img")));
+    this.app.use(
+      "/uploads",
+      express.static(path.join(__dirname, "./var/uploads"))
+    );
   }
 
   private handlerError() {
