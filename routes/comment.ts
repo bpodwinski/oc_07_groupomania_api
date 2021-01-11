@@ -1,7 +1,7 @@
 import * as express from "express";
 
 // Middleswares import
-import AuthMiddleware from "../middlewares/auth";
+import AuthMiddleware from "../middlewares/authentification";
 import MulterMiddleware from "../middlewares/multer";
 
 // Controllers import

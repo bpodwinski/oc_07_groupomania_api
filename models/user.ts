@@ -50,6 +50,10 @@ export default class user extends Model<user> {
   email!: string;
 
   @AllowNull(false)
+  @Column
+  gravatar!: string;
+
+  @AllowNull(false)
   @Length({ min: 6, max: 128 })
   @Column
   password!: string;
@@ -59,9 +63,9 @@ export default class user extends Model<user> {
   @Column
   service!: string;
 
-  @Default(false)
+  @AllowNull(false)
   @Column
-  admin!: boolean;
+  role!: string;
 
   @CreatedAt
   @Column

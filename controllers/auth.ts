@@ -2,12 +2,14 @@ import { Request, Response, NextFunction } from "express";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import * as cache from "cache-all/redis";
+import * as md5 from "md5";
 import { env } from "../utils/env";
 
 import Error from "../exceptions/app";
 
 // Routes import
 import User from "../models/user";
+import user from "../models/user";
 
 export default class UserController {
   // Register
@@ -22,11 +24,18 @@ export default class UserController {
       if (getUserByEmail !== null) {
         throw new Error(401, "User already exists");
       } else {
+        const gravatar: any =
+          "https://www.gravatar.com/avatar/" +
+          md5(req.body.email.trim().toLowerCase()) +
+          "?d=retro";
+
         const createUser = await User.create({
           firstname: req.body.firstname,
           lastname: req.body.lastname,
           service: req.body.service,
           email: req.body.email,
+          gravatar: gravatar,
+          role: "user",
           password: bcrypt.hashSync(req.body.password, 10),
         });
 
@@ -35,7 +44,8 @@ export default class UserController {
           lastname: createUser.lastname,
           service: createUser.service,
           email: createUser.email,
-          password: req.body.password,
+          role: "user",
+          gravatar: createUser.gravatar,
         };
 
         // Refresh the cache

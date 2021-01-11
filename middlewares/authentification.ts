@@ -12,14 +12,10 @@ export default class Auth {
 
       if (token === null) throw new Error(401, "There isn't token");
 
-      const decodedToken: any = jwt.verify(token, env.TOKEN);
-      const userId: number = decodedToken.userId;
+      const jwtPayload: any = jwt.verify(token, env.TOKEN);
+      res.locals.jwtPayload = jwtPayload;
 
-      if (parseInt(req.body.userId) && parseInt(req.body.userId) !== userId) {
-        throw new Error(401, "Invalid user ID");
-      } else {
-        next();
-      }
+      next();
     } catch (error) {
       next(new AuthError(error.message));
     }

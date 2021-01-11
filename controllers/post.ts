@@ -14,7 +14,7 @@ export default class PostController {
   public async getPost(req: Request, res: Response, next: NextFunction) {
     try {
       const page: number = parseInt(req.params.page);
-      const pageSize: number = 10;
+      const pageSize: number = 5;
       const cacheKey: string = "posts/page/" + page;
       const dataCached: Promise<any> = await cache.get(cacheKey);
 
@@ -28,7 +28,14 @@ export default class PostController {
           //   },
           // },
           order: [["createdAt", "DESC"]],
-          attributes: ["id", "title", "content", "createdAt", "updatedAt"],
+          attributes: [
+            "id",
+            "title",
+            "content",
+            "imgUrl",
+            "createdAt",
+            "updatedAt",
+          ],
           include: [
             {
               model: User,
@@ -36,6 +43,9 @@ export default class PostController {
                 "id",
                 "firstname",
                 "lastname",
+                "service",
+                "email",
+                "gravatar",
                 "createdAt",
                 "updatedAt",
               ],
@@ -90,7 +100,16 @@ export default class PostController {
         include: [
           {
             model: User,
-            attributes: ["firstname", "lastname", "createdAt", "updatedAt"],
+            attributes: [
+              "id",
+              "firstname",
+              "lastname",
+              "service",
+              "email",
+              "gravatar",
+              "createdAt",
+              "updatedAt",
+            ],
           },
         ],
       });
@@ -110,37 +129,102 @@ export default class PostController {
   // Create a post
   public async createPost(req: Request, res: Response, next: NextFunction) {
     try {
-      const post: any = await Post.create({
-        userId: parseInt(req.body.userId),
-        title: req.body.title,
-        content: req.body.content,
-      });
+      if (req.file !== undefined) {
+        const post: any = await Post.create({
+          userId: parseInt(req.body.userId),
+          title: req.body.title,
+          content: req.body.content,
+          imgUrl: "/uploads/" + req.file.filename,
+        });
 
-      const data = await Post.findByPk(post.id, {
-        attributes: ["id", "title", "content", "createdAt", "updatedAt"],
-        include: [
-          {
-            model: User,
-            attributes: ["firstname", "lastname", "createdAt", "updatedAt"],
-          },
-          {
-            model: Comment,
-            as: "comments",
-            attributes: ["id", "content", "createdAt", "updatedAt"],
-            include: [
-              {
-                model: User,
-                attributes: ["firstname", "lastname", "createdAt", "updatedAt"],
-              },
-            ],
-          },
-        ],
-      });
+        const data = await Post.findByPk(post.id, {
+          attributes: [
+            "id",
+            "title",
+            "content",
+            "imgUrl",
+            "createdAt",
+            "updatedAt",
+          ],
+          include: [
+            {
+              model: User,
+              attributes: ["firstname", "lastname", "createdAt", "updatedAt"],
+            },
+            {
+              model: Comment,
+              as: "comments",
+              attributes: ["id", "content", "createdAt", "updatedAt"],
+              include: [
+                {
+                  model: User,
+                  attributes: [
+                    "firstname",
+                    "lastname",
+                    "service",
+                    "email",
+                    "gravatar",
+                    "createdAt",
+                    "updatedAt",
+                  ],
+                },
+              ],
+            },
+          ],
+        });
 
-      // Refresh the cache
-      cache.removeByPattern("posts/page/");
+        // Refresh the cache
+        cache.removeByPattern("posts/page/");
 
-      res.status(201).json(data);
+        res.status(201).json(data);
+      } else {
+        const post: any = await Post.create({
+          userId: parseInt(req.body.userId),
+          title: req.body.title,
+          content: req.body.content,
+        });
+
+        const data = await Post.findByPk(post.id, {
+          attributes: [
+            "id",
+            "title",
+            "content",
+            "imgUrl",
+            "createdAt",
+            "updatedAt",
+          ],
+          include: [
+            {
+              model: User,
+              attributes: ["firstname", "lastname", "createdAt", "updatedAt"],
+            },
+            {
+              model: Comment,
+              as: "comments",
+              attributes: ["id", "content", "createdAt", "updatedAt"],
+              include: [
+                {
+                  model: User,
+                  attributes: [
+                    "firstname",
+                    "lastname",
+                    "service",
+                    "email",
+                    "gravatar",
+                    "createdAt",
+                    "updatedAt",
+                  ],
+                },
+              ],
+            },
+          ],
+        });
+
+        // Refresh the cache
+        cache.removeByPattern("posts/page/");
+
+        res.status(201).json(data);
+      }
     } catch (error) {
       next(error);
     }

@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import * as cache from "cache-all/redis";
 import { env } from "../utils/env";
-import * as bcrypt from "bcrypt";
+import Error from "../exceptions/app";
 
-// Routes import
+// Models import
 import User from "../models/user";
 
 export default class UserController {
@@ -69,13 +69,20 @@ export default class UserController {
   // Delete user
   public async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const user: any = await User.destroy({
-        where: {
-          id: req.params.id,
-        },
-      });
+      const userId = parseInt(res.locals.jwtPayload.userId);
+      const getUser = await User.findByPk(userId);
+      const user: any = getUser;
 
-      res.status(200).json({ message: user });
+      if (userId === parseInt(req.params.id) || user.role === "admin") {
+        const user: any = await User.destroy({
+          where: {
+            id: req.params.id,
+          },
+        });
+        return res.status(200).json({ message: user });
+      }
+
+      next(new Error(401, "Not authorized"));
     } catch (error) {
       next(error);
     }

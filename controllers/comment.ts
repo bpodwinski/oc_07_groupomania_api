@@ -37,7 +37,16 @@ export default class CommentController {
         include: [
           {
             model: User,
-            attributes: ["firstname", "lastname", "createdAt", "updatedAt"],
+            attributes: [
+              "id",
+              "firstname",
+              "lastname",
+              "service",
+              "email",
+              "gravatar",
+              "createdAt",
+              "updatedAt",
+            ],
           },
         ],
       });
