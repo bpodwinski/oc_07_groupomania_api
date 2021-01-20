@@ -1,4 +1,3 @@
-import { env } from "../utils/env";
 import Error from "../exceptions/app";
 import AuthError from "../exceptions/auth";
 import { Request, Response, NextFunction } from "express";
@@ -12,7 +11,10 @@ export default class Auth {
 
       if (token === null) throw new Error(401, "There isn't token");
 
-      const jwtPayload: any = jwt.verify(token, env.TOKEN);
+      const jwtPayload: any = jwt.verify(
+        token,
+        process.env.TOKEN || "3P5DEkDn8yz0H9IgVU22"
+      );
       res.locals.jwtPayload = jwtPayload;
 
       next();

@@ -1,4 +1,3 @@
-import { env } from "./utils/env";
 import App from "./app";
 import * as bodyParser from "body-parser";
 
@@ -13,15 +12,8 @@ import PostRoute from "./routes/post";
 import CommentRoute from "./routes/comment";
 
 const app: any = new App({
-  host: env.HOST,
-  port: env.PORT,
-  redis_db: env.REDIS_DB,
-  redis_port: env.REDIS_PORT,
-  redis_host: env.REDIS_HOST,
-  redis_pass: env.REDIS_PASS,
-  redis_prefix: env.REDIS_PREFIX,
-  cache_ttl: env.CACHE_TTL,
-  cache_enable: env.CACHE_ENABLE,
+  host: process.env.HOST || "localhost",
+  port: process.env.PORT || "3000",
   middlewares: [
     new CorsMiddleware().cors,
     bodyParser.json(),
@@ -31,7 +23,7 @@ const app: any = new App({
   routes: [
     new AuthRoute(),
     new UserRoute(),
-    //new PostRoute(),
+    new PostRoute(),
     new CommentRoute(),
   ],
 });

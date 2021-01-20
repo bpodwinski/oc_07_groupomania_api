@@ -1,6 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import * as cache from "cache-all/redis";
-import { env } from "../utils/env";
 import Error from "../exceptions/app";
 import db from "../prisma";
 
@@ -10,43 +8,32 @@ export default class PostController {
     try {
       const page: number = parseInt(req.params.page);
       const pageSize: number = 5;
-      const cacheKey: string = "posts/page/" + page;
-      const dataCached: Promise<any> = await cache.get(cacheKey);
 
-      if (dataCached === null) {
-        const data = await db.gpm_post.findMany({
-          take: pageSize,
-          skip: page * pageSize,
-          orderBy: [
-            {
-              createdAt: "desc",
-            },
-          ],
-          select: {
-            id: true,
-            title: true,
-            content: true,
-            imgUrl: true,
-            createdAt: true,
-            updatedAt: true,
+      const data = await db.post.findMany({
+        take: pageSize,
+        //skip: page * pageSize,
+        orderBy: [
+          {
+            createdAt: "desc",
           },
-          include: {
-            gpm_user: true,
-          },
-        });
+        ],
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          imgUrl: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
 
-        const dataResult: object = {
-          page: page,
-          pageSize: pageSize,
-          posts: data,
-        };
+      const dataResult: object = {
+        page: page,
+        pageSize: pageSize,
+        posts: data,
+      };
 
-        cache.set(cacheKey, dataResult, env.CACHE_TTL);
-
-        return res.status(200).json(dataResult);
-      }
-
-      res.status(200).json(dataCached);
+      return res.status(200).json(dataResult);
     } catch (error) {
       next(error);
     }
@@ -56,7 +43,7 @@ export default class PostController {
   public async getPostComment(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const data: any = await db.gpm_comment.findMany({
+      const data: any = await db.comment.findMany({
         where: {
           postId: id,
         },
@@ -66,7 +53,7 @@ export default class PostController {
           },
         ],
         include: {
-          gpm_user: true,
+          user: true,
         },
       });
 
@@ -86,45 +73,39 @@ export default class PostController {
   public async createPost(req: Request, res: Response, next: NextFunction) {
     try {
       if (req.file !== undefined) {
-        const post: any = await db.gpm_post.create({
+        const post: any = await db.post.create({
           data: {
-            gpm_user: req.body.userId,
+            user: req.body.userId,
             title: req.body.title,
             content: req.body.content,
             imgUrl: "/uploads/" + req.file.filename,
           },
         });
 
-        const data = await db.gpm_post.findUnique({
+        const data = await db.post.findUnique({
           where: {
             id: req.body.id,
           },
           include: {
-            gpm_user: true,
+            user: true,
           },
         });
 
-        // Refresh the cache
-        cache.removeByPattern("posts/page/");
-
         res.status(201).json(data);
       } else {
-        const post: any = await db.gpm_post.create({
+        const post: any = await db.post.create({
           data: {
-            gpm_user: req.body.userId,
+            user: req.body.userId,
             title: req.body.title,
             content: req.body.content,
           },
         });
 
-        const data = await db.gpm_post.findUnique({
+        const data = await db.post.findUnique({
           where: {
             id: req.body.id,
           },
         });
-
-        // Refresh the cache
-        cache.removeByPattern("posts/page/");
 
         res.status(201).json(data);
       }
@@ -137,7 +118,7 @@ export default class PostController {
   public async deletePost(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const post: any = await db.gpm_post.findUnique({
+      const post: any = await db.post.findUnique({
         where: {
           id: id,
         },
@@ -147,14 +128,11 @@ export default class PostController {
         throw new Error(404, "Not found");
       }
 
-      const deletePost: any = await db.gpm_post.delete({
+      const deletePost: any = await db.post.delete({
         where: {
           id: id,
         },
       });
-
-      // Refresh the cache
-      cache.removeByPattern("posts/page/");
 
       res.status(204).json(deletePost);
     } catch (error) {

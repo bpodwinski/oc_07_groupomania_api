@@ -1,6 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import * as cache from "cache-all/redis";
-import { env } from "../utils/env";
 import db from "../prisma";
 import Error from "../exceptions/app";
 
@@ -8,15 +6,8 @@ export default class UserController {
   // Get all users
   public async getUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const dataCached: Promise<any> = await cache.get("users_all");
-
-      if (dataCached === null) {
-        const data = await db.gpm_user.findMany();
-        cache.set("users_all", data, env.CACHE_TTL);
-        return res.status(200).json(data);
-      }
-
-      return res.status(200).json(dataCached);
+      const data = await db.user.findMany();
+      return res.status(200).json(data);
     } catch (error) {
       next(error);
     }
@@ -26,19 +17,12 @@ export default class UserController {
   public async getUserById(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const dataCached: Promise<any> = await cache.get("user/" + id);
-
-      if (dataCached === null) {
-        const data = await db.gpm_user.findUnique({
-          where: {
-            id: id,
-          },
-        });
-        cache.set("user/" + id, data, env.CACHE_TTL);
-        return res.status(200).json(data);
-      }
-
-      res.status(200).json(dataCached);
+      const data = await db.user.findUnique({
+        where: {
+          id: id,
+        },
+      });
+      return res.status(200).json(data);
     } catch (error) {
       next(error);
     }
@@ -48,7 +32,7 @@ export default class UserController {
   public async updateUser(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const user: any = await db.gpm_user.update({
+      const user: any = await db.user.update({
         data: {
           firstname: req.body.firstname,
           lastname: req.body.lastname,
@@ -69,7 +53,7 @@ export default class UserController {
   public async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = parseInt(res.locals.jwtPayload.userId);
-      const getUser = await db.gpm_user.findUnique({
+      const getUser = await db.user.findUnique({
         where: {
           id: userId,
         },
@@ -77,7 +61,7 @@ export default class UserController {
       const user: any = getUser;
 
       if (userId === parseInt(req.params.id) || user.role === "admin") {
-        const user: any = await db.gpm_user.delete({
+        const user: any = await db.user.delete({
           where: {
             id: parseInt(req.params.id),
           },

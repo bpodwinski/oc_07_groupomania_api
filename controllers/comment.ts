@@ -7,7 +7,7 @@ export default class CommentController {
   public async getCommentById(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const comment: any = await db.gpm_comment.findUnique({
+      const comment: any = await db.comment.findUnique({
         where: {
           id: id,
         },
@@ -26,15 +26,15 @@ export default class CommentController {
   // Create a comment
   public async createComment(req: Request, res: Response, next: NextFunction) {
     try {
-      const data: any = await db.gpm_comment.create({
+      const data: any = await db.comment.create({
         data: {
           content: req.body.content,
-          gpm_post: req.body.postId,
-          gpm_user: req.body.userId,
+          post: req.body.postId,
+          user: req.body.userId,
         },
       });
 
-      const dataResult = await db.gpm_comment.findUnique({
+      const dataResult = await db.comment.findUnique({
         where: {
           id: data.id,
         },
@@ -45,7 +45,7 @@ export default class CommentController {
           updatedAt: true,
         },
         include: {
-          gpm_user: true,
+          user: true,
         },
       });
       res.status(201).json(dataResult);
@@ -58,7 +58,7 @@ export default class CommentController {
   public async deleteComment(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const comment: any = await db.gpm_comment.findUnique({
+      const comment: any = await db.comment.findUnique({
         where: {
           id: id,
         },
@@ -68,7 +68,7 @@ export default class CommentController {
         throw new Error(404, "Not found");
       }
 
-      const deleteComment: any = await db.gpm_comment.delete({
+      const deleteComment: any = await db.comment.delete({
         where: {
           id: id,
         },

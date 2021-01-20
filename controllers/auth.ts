@@ -3,7 +3,6 @@ import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import * as cache from "cache-all/redis";
 import * as md5 from "md5";
-import { env } from "../utils/env";
 import db from "../prisma";
 import Error from "../exceptions/app";
 
@@ -11,7 +10,7 @@ export default class UserController {
   // Register
   public async userRegister(req: Request, res: Response, next: NextFunction) {
     try {
-      const getUserByEmail = await db.gpm_user.findUnique({
+      const getUserByEmail = await db.user.findUnique({
         where: {
           email: req.body.email,
         },
@@ -25,7 +24,7 @@ export default class UserController {
           md5(req.body.email.trim().toLowerCase()) +
           "?d=retro";
 
-        const createUser = await db.gpm_user.create({
+        const createUser = await db.user.create({
           data: {
             firstname: req.body.firstname,
             lastname: req.body.lastname,
@@ -58,7 +57,7 @@ export default class UserController {
   // Login
   public async userLogin(req: Request, res: Response, next: NextFunction) {
     try {
-      const user = await db.gpm_user.findUnique({
+      const user = await db.user.findUnique({
         where: {
           email: req.body.email,
         },
@@ -75,9 +74,13 @@ export default class UserController {
           httpStatus: 200,
           type: 0,
           userId: user.id,
-          token: jwt.sign({ userId: user.id }, env.TOKEN, {
-            expiresIn: "1h",
-          }),
+          token: jwt.sign(
+            { userId: user.id },
+            process.env.TOKEN || "3P5DEkDn8yz0H9IgVU22",
+            {
+              expiresIn: "1h",
+            }
+          ),
         });
       } else {
         return res.status(202).json({
