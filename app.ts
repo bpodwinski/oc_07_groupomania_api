@@ -1,7 +1,6 @@
 import { env } from "./utils/env";
 
 import AppError from "./middlewares/error";
-import { Sequelize } from "sequelize-typescript";
 import * as express from "express";
 import * as cache from "cache-all/redis";
 import * as path from "path";
@@ -11,10 +10,6 @@ export default class App {
   public cache: void;
   public host: string;
   public port: number;
-  public db_name: string;
-  public db_host: string;
-  public db_user: string;
-  public db_pass: string;
   public redis_db: string | undefined;
   public redis_port: number;
   public redis_host: string;
@@ -26,10 +21,6 @@ export default class App {
   constructor(appInit: {
     host: string;
     port: number;
-    db_name: string;
-    db_host: string;
-    db_user: string;
-    db_pass: string;
     redis_db: string | undefined;
     redis_port: number;
     redis_host: string;
@@ -43,10 +34,6 @@ export default class App {
     this.app = express();
     this.host = appInit.host;
     this.port = appInit.port;
-    this.db_name = appInit.db_name;
-    this.db_host = appInit.db_host;
-    this.db_user = appInit.db_user;
-    this.db_pass = appInit.db_pass;
     this.redis_db = appInit.redis_db;
     this.redis_port = appInit.redis_port;
     this.redis_host = appInit.redis_host;
@@ -56,7 +43,6 @@ export default class App {
     this.cache_enable = appInit.cache_enable;
 
     this.cacheRoutes();
-    this.db();
     this.options();
     this.middlewares(appInit.middlewares);
     this.routes(appInit.routes);
@@ -89,20 +75,6 @@ export default class App {
     routes.forEach((routes) => {
       this.app.use("/api", routes.router);
     });
-  }
-
-  private db() {
-    const sequelize = new Sequelize({
-      database: this.db_name,
-      host: this.db_host,
-      username: this.db_user,
-      password: this.db_pass,
-      dialect: "mysql",
-      storage: "mysql",
-      models: [__dirname + "/models"],
-    });
-
-    sequelize.sync({ force: false });
   }
 
   private options() {

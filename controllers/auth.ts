@@ -4,18 +4,14 @@ import * as jwt from "jsonwebtoken";
 import * as cache from "cache-all/redis";
 import * as md5 from "md5";
 import { env } from "../utils/env";
-
+import db from "../prisma";
 import Error from "../exceptions/app";
-
-// Routes import
-import User from "../models/user";
-import user from "../models/user";
 
 export default class UserController {
   // Register
   public async userRegister(req: Request, res: Response, next: NextFunction) {
     try {
-      const getUserByEmail = await User.findOne({
+      const getUserByEmail = await db.gpm_user.findUnique({
         where: {
           email: req.body.email,
         },
@@ -29,29 +25,30 @@ export default class UserController {
           md5(req.body.email.trim().toLowerCase()) +
           "?d=retro";
 
-        const createUser = await User.create({
-          firstname: req.body.firstname,
-          lastname: req.body.lastname,
-          service: req.body.service,
-          email: req.body.email,
-          gravatar: gravatar,
-          role: "user",
-          password: bcrypt.hashSync(req.body.password, 10),
+        const createUser = await db.gpm_user.create({
+          data: {
+            firstname: req.body.firstname,
+            lastname: req.body.lastname,
+            service: req.body.service,
+            email: req.body.email,
+            gravatar: gravatar,
+            role: "user",
+            password: bcrypt.hashSync(req.body.password, 10),
+          },
+          select: {
+            firstname: true,
+            lastname: true,
+            service: true,
+            email: true,
+            role: true,
+            gravatar: true,
+          },
         });
-
-        const response: object = {
-          firstname: createUser.firstname,
-          lastname: createUser.lastname,
-          service: createUser.service,
-          email: createUser.email,
-          role: "user",
-          gravatar: createUser.gravatar,
-        };
 
         // Refresh the cache
         cache.removeByPattern("users_all");
 
-        return res.status(201).json(response);
+        return res.status(201).json(createUser);
       }
     } catch (error) {
       next(error);
@@ -61,10 +58,9 @@ export default class UserController {
   // Login
   public async userLogin(req: Request, res: Response, next: NextFunction) {
     try {
-      const email: string = req.body.email;
-      const user: any = await User.findOne({
+      const user = await db.gpm_user.findUnique({
         where: {
-          email: email,
+          email: req.body.email,
         },
       });
       if (!user) {

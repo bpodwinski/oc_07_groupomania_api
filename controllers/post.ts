@@ -1,13 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import * as cache from "cache-all/redis";
 import { env } from "../utils/env";
-const { Op } = require("sequelize");
 import Error from "../exceptions/app";
-
-// Models import
-import Post from "../models/post";
-import User from "../models/user";
-import Comment from "../models/comment";
+import db from "../prisma";
 
 export default class PostController {
   // Get posts
@@ -19,61 +14,31 @@ export default class PostController {
       const dataCached: Promise<any> = await cache.get(cacheKey);
 
       if (dataCached === null) {
-        const data = await Post.findAndCountAll({
-          limit: pageSize,
-          offset: page * pageSize,
-          // where: {
-          //   id: {
-          //     [Op.lte]: page * 10,
-          //   },
-          // },
-          order: [["createdAt", "DESC"]],
-          attributes: [
-            "id",
-            "title",
-            "content",
-            "imgUrl",
-            "createdAt",
-            "updatedAt",
-          ],
-          include: [
+        const data = await db.gpm_post.findMany({
+          take: pageSize,
+          skip: page * pageSize,
+          orderBy: [
             {
-              model: User,
-              attributes: [
-                "id",
-                "firstname",
-                "lastname",
-                "service",
-                "email",
-                "gravatar",
-                "createdAt",
-                "updatedAt",
-              ],
+              createdAt: "desc",
             },
-            // {
-            //   model: Comment,
-            //   as: "comments",
-            //   attributes: ["id", "content", "createdAt", "updatedAt"],
-            //   include: [
-            //     {
-            //       model: User,
-            //       attributes: [
-            //         "firstname",
-            //         "lastname",
-            //         "createdAt",
-            //         "updatedAt",
-            //       ],
-            //     },
-            //   ],
-            // },
           ],
+          select: {
+            id: true,
+            title: true,
+            content: true,
+            imgUrl: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+          include: {
+            gpm_user: true,
+          },
         });
 
         const dataResult: object = {
           page: page,
           pageSize: pageSize,
-          total: data.count,
-          posts: data.rows,
+          posts: data,
         };
 
         cache.set(cacheKey, dataResult, env.CACHE_TTL);
@@ -91,27 +56,18 @@ export default class PostController {
   public async getPostComment(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const data: any = await Comment.findAndCountAll({
+      const data: any = await db.gpm_comment.findMany({
         where: {
-          postID: id,
+          postId: id,
         },
-        order: [["createdAt", "DESC"]],
-        attributes: ["content", "createdAt", "updatedAt"],
-        include: [
+        orderBy: [
           {
-            model: User,
-            attributes: [
-              "id",
-              "firstname",
-              "lastname",
-              "service",
-              "email",
-              "gravatar",
-              "createdAt",
-              "updatedAt",
-            ],
+            createdAt: "desc",
           },
         ],
+        include: {
+          gpm_user: true,
+        },
       });
 
       const dataResult: object = {
@@ -130,47 +86,22 @@ export default class PostController {
   public async createPost(req: Request, res: Response, next: NextFunction) {
     try {
       if (req.file !== undefined) {
-        const post: any = await Post.create({
-          userId: parseInt(req.body.userId),
-          title: req.body.title,
-          content: req.body.content,
-          imgUrl: "/uploads/" + req.file.filename,
+        const post: any = await db.gpm_post.create({
+          data: {
+            gpm_user: req.body.userId,
+            title: req.body.title,
+            content: req.body.content,
+            imgUrl: "/uploads/" + req.file.filename,
+          },
         });
 
-        const data = await Post.findByPk(post.id, {
-          attributes: [
-            "id",
-            "title",
-            "content",
-            "imgUrl",
-            "createdAt",
-            "updatedAt",
-          ],
-          include: [
-            {
-              model: User,
-              attributes: ["firstname", "lastname", "createdAt", "updatedAt"],
-            },
-            {
-              model: Comment,
-              as: "comments",
-              attributes: ["id", "content", "createdAt", "updatedAt"],
-              include: [
-                {
-                  model: User,
-                  attributes: [
-                    "firstname",
-                    "lastname",
-                    "service",
-                    "email",
-                    "gravatar",
-                    "createdAt",
-                    "updatedAt",
-                  ],
-                },
-              ],
-            },
-          ],
+        const data = await db.gpm_post.findUnique({
+          where: {
+            id: req.body.id,
+          },
+          include: {
+            gpm_user: true,
+          },
         });
 
         // Refresh the cache
@@ -178,46 +109,18 @@ export default class PostController {
 
         res.status(201).json(data);
       } else {
-        const post: any = await Post.create({
-          userId: parseInt(req.body.userId),
-          title: req.body.title,
-          content: req.body.content,
+        const post: any = await db.gpm_post.create({
+          data: {
+            gpm_user: req.body.userId,
+            title: req.body.title,
+            content: req.body.content,
+          },
         });
 
-        const data = await Post.findByPk(post.id, {
-          attributes: [
-            "id",
-            "title",
-            "content",
-            "imgUrl",
-            "createdAt",
-            "updatedAt",
-          ],
-          include: [
-            {
-              model: User,
-              attributes: ["firstname", "lastname", "createdAt", "updatedAt"],
-            },
-            {
-              model: Comment,
-              as: "comments",
-              attributes: ["id", "content", "createdAt", "updatedAt"],
-              include: [
-                {
-                  model: User,
-                  attributes: [
-                    "firstname",
-                    "lastname",
-                    "service",
-                    "email",
-                    "gravatar",
-                    "createdAt",
-                    "updatedAt",
-                  ],
-                },
-              ],
-            },
-          ],
+        const data = await db.gpm_post.findUnique({
+          where: {
+            id: req.body.id,
+          },
         });
 
         // Refresh the cache
@@ -234,13 +137,17 @@ export default class PostController {
   public async deletePost(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const post: any = await Post.findByPk(id);
+      const post: any = await db.gpm_post.findUnique({
+        where: {
+          id: id,
+        },
+      });
 
       if (!post) {
         throw new Error(404, "Not found");
       }
 
-      const deletePost: any = await Post.destroy({
+      const deletePost: any = await db.gpm_post.delete({
         where: {
           id: id,
         },
