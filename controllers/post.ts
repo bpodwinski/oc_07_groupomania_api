@@ -24,6 +24,18 @@ export default class PostController {
           imgUrl: true,
           createdAt: true,
           updatedAt: true,
+          user: {
+            select: {
+              id: true,
+              firstname: true,
+              lastname: true,
+              service: true,
+              email: true,
+              gravatar: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
         },
       });
 
@@ -43,7 +55,7 @@ export default class PostController {
   public async getPostComment(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const data: any = await db.comment.findMany({
+      const data = await db.comment.findMany({
         where: {
           postId: id,
         },
@@ -52,18 +64,27 @@ export default class PostController {
             createdAt: "desc",
           },
         ],
-        include: {
-          user: true,
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+          user: {
+            select: {
+              id: true,
+              firstname: true,
+              lastname: true,
+              service: true,
+              email: true,
+              gravatar: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
         },
       });
 
-      const dataResult: object = {
-        postID: id,
-        total: data.count,
-        comments: data.rows,
-      };
-
-      res.status(200).json(dataResult);
+      res.status(200).json(data);
     } catch (error) {
       next(error);
     }
@@ -73,37 +94,100 @@ export default class PostController {
   public async createPost(req: Request, res: Response, next: NextFunction) {
     try {
       if (req.file !== undefined) {
-        const post: any = await db.post.create({
+        const data = await db.post.create({
           data: {
-            user: req.body.userId,
+            user: {
+              connect: {
+                id: parseInt(req.body.userId),
+              },
+            },
             title: req.body.title,
             content: req.body.content,
             imgUrl: "/uploads/" + req.file.filename,
           },
-        });
-
-        const data = await db.post.findUnique({
-          where: {
-            id: req.body.id,
-          },
-          include: {
-            user: true,
+          select: {
+            id: true,
+            title: true,
+            content: true,
+            imgUrl: true,
+            createdAt: true,
+            updatedAt: true,
+            user: {
+              select: {
+                firstname: true,
+                lastname: true,
+                createdAt: true,
+                updatedAt: true,
+                comment: {
+                  select: {
+                    id: true,
+                    content: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    user: {
+                      select: {
+                        firstname: true,
+                        lastname: true,
+                        service: true,
+                        email: true,
+                        gravatar: true,
+                        createdAt: true,
+                        updatedAt: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         });
 
         res.status(201).json(data);
       } else {
-        const post: any = await db.post.create({
+        const data = await db.post.create({
           data: {
-            user: req.body.userId,
+            user: {
+              connect: {
+                id: parseInt(req.body.userId),
+              },
+            },
             title: req.body.title,
             content: req.body.content,
           },
-        });
-
-        const data = await db.post.findUnique({
-          where: {
-            id: req.body.id,
+          select: {
+            id: true,
+            title: true,
+            content: true,
+            imgUrl: true,
+            createdAt: true,
+            updatedAt: true,
+            user: {
+              select: {
+                firstname: true,
+                lastname: true,
+                createdAt: true,
+                updatedAt: true,
+                comment: {
+                  select: {
+                    id: true,
+                    content: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    user: {
+                      select: {
+                        firstname: true,
+                        lastname: true,
+                        service: true,
+                        email: true,
+                        gravatar: true,
+                        createdAt: true,
+                        updatedAt: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         });
 
@@ -118,7 +202,7 @@ export default class PostController {
   public async deletePost(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const post: any = await db.post.findUnique({
+      const post = await db.post.findUnique({
         where: {
           id: id,
         },
@@ -128,7 +212,7 @@ export default class PostController {
         throw new Error(404, "Not found");
       }
 
-      const deletePost: any = await db.post.delete({
+      const deletePost = await db.post.delete({
         where: {
           id: id,
         },

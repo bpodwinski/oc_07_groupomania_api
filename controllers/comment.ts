@@ -7,17 +7,17 @@ export default class CommentController {
   public async getCommentById(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const comment: any = await db.comment.findUnique({
+      const getComment = await db.comment.findUnique({
         where: {
           id: id,
         },
       });
 
-      if (!comment) {
+      if (!getComment) {
         throw new Error(404, "Not found");
       }
 
-      res.status(200).json(comment);
+      res.status(200).json(getComment);
     } catch (error) {
       next(error);
     }
@@ -26,29 +26,40 @@ export default class CommentController {
   // Create a comment
   public async createComment(req: Request, res: Response, next: NextFunction) {
     try {
-      const data: any = await db.comment.create({
+      const createComment = await db.comment.create({
         data: {
+          user: {
+            connect: {
+              id: parseInt(req.body.userId),
+            },
+          },
+          post: {
+            connect: {
+              id: parseInt(req.body.postId),
+            },
+          },
           content: req.body.content,
-          post: req.body.postId,
-          user: req.body.userId,
-        },
-      });
-
-      const dataResult = await db.comment.findUnique({
-        where: {
-          id: data.id,
         },
         select: {
           postId: true,
           content: true,
           createdAt: true,
           updatedAt: true,
-        },
-        include: {
-          user: true,
+          user: {
+            select: {
+              id: true,
+              firstname: true,
+              lastname: true,
+              service: true,
+              email: true,
+              gravatar: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
         },
       });
-      res.status(201).json(dataResult);
+      res.status(201).json(createComment);
     } catch (error) {
       next(error);
     }
@@ -58,13 +69,13 @@ export default class CommentController {
   public async deleteComment(req: Request, res: Response, next: NextFunction) {
     try {
       const id: number = parseInt(req.params.id);
-      const comment: any = await db.comment.findUnique({
+      const getComment = await db.comment.findUnique({
         where: {
           id: id,
         },
       });
 
-      if (!comment) {
+      if (!getComment) {
         throw new Error(404, "Not found");
       }
 

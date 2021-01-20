@@ -12,9 +12,9 @@ model comment {
   id        Int       @id @default(autoincrement()) @db.Int
   postId    Int       @db.Int
   userId    Int       @db.Int
-  content   String    @db.VarChar(1000)
-  createdAt DateTime? @default(now()) @db.Datetime(3)
-  updatedAt DateTime? @db.Datetime(3)
+  content   String    @db.LongText
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
   post      post      @relation(fields: [postId], references: [id])
   user      user      @relation(fields: [userId], references: [id])
 
@@ -26,10 +26,10 @@ model post {
   id        Int       @id @default(autoincrement()) @db.Int
   userId    Int       @db.Int
   title     String    @db.VarChar(191)
-  content   String    @db.VarChar(1000)
+  content   String    @db.LongText
   imgUrl    String?   @db.VarChar(191)
-  createdAt DateTime? @default(now()) @db.Datetime(3)
-  updatedAt DateTime? @db.Datetime(3)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
   user      user      @relation(fields: [userId], references: [id])
   comment   comment[]
 
@@ -45,8 +45,8 @@ model user {
   password  String    @db.VarChar(191)
   service   String    @db.VarChar(191)
   role      String    @db.VarChar(191)
-  createdAt DateTime? @default(now()) @db.Datetime(3)
-  updatedAt DateTime? @db.Datetime(3)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
   comment   comment[]
   post      post[]
 }
