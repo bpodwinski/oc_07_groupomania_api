@@ -1,31 +1,23 @@
-import App from "./app";
-import * as bodyParser from "body-parser";
+import { ApolloServer } from "apollo-server";
+import { applyMiddleware } from "graphql-middleware";
+import { app } from "./app";
+import { createContext } from "./context";
+import { permissions } from "./middlewares/permission";
 
-// Middlewares import
-import CorsMiddleware from "./middlewares/cors";
-import MulterMiddleware from "./middlewares/multer";
+const schema = app.createSchemaForApollo();
 
-// Routes import
-import AuthRoute from "./routes/auth";
-import UserRoute from "./routes/user";
-import PostRoute from "./routes/post";
-import CommentRoute from "./routes/comment";
-
-const app: any = new App({
-  host: process.env.HOST || "localhost",
-  port: process.env.PORT || "3000",
-  middlewares: [
-    new CorsMiddleware().cors,
-    bodyParser.json(),
-    bodyParser.urlencoded({ extended: true }),
-    new MulterMiddleware().multer.single("image"),
-  ],
-  routes: [
-    new AuthRoute(),
-    new UserRoute(),
-    new PostRoute(),
-    new CommentRoute(),
-  ],
-});
-
-app.listen();
+new ApolloServer({
+  schema: applyMiddleware(schema, permissions),
+  cors: {
+    origin: process.env.URL_CORS,
+    credentials: true,
+    methods: "HEAD,GET,POST",
+    allowedHeaders:
+      "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization",
+  },
+  context: createContext,
+}).listen({ host: process.env.HOST, port: process.env.PORT }, () =>
+  console.log(
+    `🚀 Environment ${process.env.NODE_ENV} -> ${process.env.APP_NAME} listening on the http://${process.env.HOST}:${process.env.PORT}`
+  )
+);

@@ -31,7 +31,7 @@ model post {
   createdAt DateTime? @default(now())
   updatedAt DateTime?
   user      user      @relation(fields: [userId], references: [id])
-  comment   comment[]
+  comments  comment[]
 
   @@index([userId], name: "userId")
 }
@@ -47,6 +47,6 @@ model user {
   role      String    @db.VarChar(191)
   createdAt DateTime? @default(now())
   updatedAt DateTime?
-  comment   comment[]
-  post      post[]
+  comments  comment[]
+  posts     post[]
 }

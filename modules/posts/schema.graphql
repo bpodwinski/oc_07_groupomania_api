@@ -1,0 +1,26 @@
+scalar Date
+
+type Post {
+  id: ID!
+  userId: ID!
+  title: String!
+  content: String!
+  imgUrl: String
+  createdAt: Date!
+  updatedAt: Date
+  user: User!
+}
+
+extend type Query {
+  posts: [Post]
+  post(id: ID!): Post
+}
+
+extend type Mutation {
+  createPost(
+    userId: ID!
+    title: String!
+    content: String!
+    imgUrl: String
+  ): Post
+}
