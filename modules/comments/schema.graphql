@@ -1,0 +1,19 @@
+type Comment {
+  id: ID!
+  postId: String!
+  userId: String!
+  content: String!
+  createdAt: Date!
+  updatedAt: Date
+  user: User!
+  post: Post!
+}
+
+extend type Query {
+  comment(id: ID!): Comment
+  comments: [Comment]
+}
+
+extend type Mutation {
+  commentCreate(postId: String!, userId: String!, content: String!): Comment
+}
