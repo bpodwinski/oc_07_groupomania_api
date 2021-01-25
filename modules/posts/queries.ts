@@ -3,8 +3,8 @@ import { createModule } from "graphql-modules";
 import { Context } from "../../context";
 import * as postType from "./schema.graphql";
 
-export const postQueriesModule = createModule({
-  id: "postQueriesModule",
+export const postsQueriesModule = createModule({
+  id: "postsQueriesModule",
   dirname: __dirname,
   typeDefs: [postType],
   resolvers: {

@@ -3,8 +3,8 @@ import { createModule } from "graphql-modules";
 import { Context } from "../../context";
 import * as commentType from "./schema.graphql";
 
-export const commentMutationsModule = createModule({
-  id: "commentMutationsModule",
+export const commentsMutationsModule = createModule({
+  id: "commentsMutationsModule",
   dirname: __dirname,
   typeDefs: [commentType],
   resolvers: {
