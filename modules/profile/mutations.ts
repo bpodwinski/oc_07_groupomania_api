@@ -1,9 +1,11 @@
+import { updateProfileDefinition } from "./mutations.d";
 import "graphql-import-node";
 import { createModule } from "graphql-modules";
 import { Context } from "../../context";
 import * as profileType from "./schema.graphql";
 import * as bcrypt from "bcrypt";
 import * as md5 from "md5";
+import { getUserId } from "../../utils/auth";
 
 export const profileMutationsModule = createModule({
   id: "profileMutationsModule",
@@ -11,7 +13,12 @@ export const profileMutationsModule = createModule({
   typeDefs: [profileType],
   resolvers: {
     Mutation: {
-      updateProfile: async (parent: any, args: any, ctx: Context) => {
+      updateProfile: async (
+        parent: any,
+        args: updateProfileDefinition,
+        context: Context
+      ) => {
+        const userId = getUserId(context);
         let gravatar: string | undefined;
 
         if (args.email) {
@@ -28,18 +35,29 @@ export const profileMutationsModule = createModule({
           args.password = bcrypt.hashSync(args.password, salt);
         }
 
-        return await ctx.prisma.user.update({
-          where: { id: parseInt(args.id) },
-          data: {
-            id: parseInt(args.id),
-            firstname: args.firstname,
-            lastname: args.lastname,
-            service: args.service,
-            email: args.email,
-            gravatar: gravatar,
-            password: args.password,
-          },
-        });
+        if (userId) {
+          return await context.prisma.user.update({
+            where: { id: userId },
+            data: {
+              firstname: args.firstname,
+              lastname: args.lastname,
+              service: args.service,
+              email: args.email,
+              gravatar: gravatar,
+              password: args.password,
+            },
+            select: {
+              id: true,
+              firstname: true,
+              lastname: true,
+              service: true,
+              email: true,
+              gravatar: true,
+              role: true,
+              posts: true,
+            },
+          });
+        }
       },
     },
   },

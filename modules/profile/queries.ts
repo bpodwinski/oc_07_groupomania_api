@@ -1,3 +1,4 @@
+import { profileDefinition } from "./queries.d";
 import "graphql-import-node";
 import { createModule } from "graphql-modules";
 import { Context } from "../../context";
@@ -9,10 +10,14 @@ export const profileQueriesModule = createModule({
   typeDefs: [profileType],
   resolvers: {
     Query: {
-      profile: async (parent: any, args: any, ctx: Context) => {
-        return await ctx.prisma.user.findUnique({
+      profile: async (
+        parent: any,
+        args: profileDefinition,
+        context: Context
+      ) => {
+        return await context.prisma.user.findUnique({
           where: {
-            id: parseInt(args.id),
+            id: args.id,
           },
           select: {
             id: true,

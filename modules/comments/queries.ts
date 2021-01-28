@@ -1,3 +1,4 @@
+import { commentsDefinition } from "./queries.d";
 import "graphql-import-node";
 import { createModule } from "graphql-modules";
 import { Context } from "../../context";
@@ -9,8 +10,12 @@ export const commentsQueriesModule = createModule({
   typeDefs: [commentType],
   resolvers: {
     Query: {
-      comments: async (parent: any, args: any, ctx: Context) => {
-        return await ctx.prisma.comment.findMany({
+      comments: async (
+        parent: any,
+        args: commentsDefinition,
+        context: Context
+      ) => {
+        return await context.prisma.comment.findMany({
           orderBy: {
             createdAt: "desc",
           },
@@ -46,10 +51,14 @@ export const commentsQueriesModule = createModule({
           },
         });
       },
-      comment: async (parent: any, args: any, ctx: Context) => {
-        return await ctx.prisma.comment.findUnique({
+      comment: async (
+        parent: any,
+        args: commentsDefinition,
+        context: Context
+      ) => {
+        return await context.prisma.comment.findUnique({
           where: {
-            id: parseInt(args.id),
+            id: args.id,
           },
           select: {
             id: true,

@@ -1,7 +1,9 @@
+import { createPostDefinition } from "./mutations.d";
 import "graphql-import-node";
 import { createModule } from "graphql-modules";
 import { Context } from "../../context";
 import * as postType from "./schema.graphql";
+import { getUserId } from "../../utils/auth";
 
 export const postsMutationsModule = createModule({
   id: "postsMutationsModule",
@@ -9,14 +11,22 @@ export const postsMutationsModule = createModule({
   typeDefs: [postType],
   resolvers: {
     Mutation: {
-      createPost: async (parent: any, args: any, ctx: Context) => {
-        return ctx.prisma.post.create({
-          data: {
-            userId: parseInt(args.userId),
-            title: args.title,
-            content: args.content,
-          },
-        });
+      createPost: async (
+        parent: any,
+        args: createPostDefinition,
+        context: Context
+      ) => {
+        const userId = getUserId(context);
+
+        if (userId) {
+          return context.prisma.post.create({
+            data: {
+              userId: userId,
+              title: args.title,
+              content: args.content,
+            },
+          });
+        }
       },
     },
   },

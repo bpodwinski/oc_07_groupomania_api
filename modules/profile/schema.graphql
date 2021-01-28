@@ -10,12 +10,11 @@ type Profile {
 }
 
 extend type Query {
-  profile(id: ID!): Profile
+  profile: Profile
 }
 
 extend type Mutation {
   updateProfile(
-    id: ID!
     firstname: String
     lastname: String
     service: String
