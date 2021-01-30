@@ -1,12 +1,13 @@
 type Comment {
   id: ID!
-  postId: ID!
-  userId: ID!
+  post_id: ID!
+  user_id: ID!
   content: String!
-  createdAt: Date!
-  updatedAt: Date
-  user: User!
-  post: Post!
+  user: User
+  post: Post
+  created_at: Date!
+  updated_at: Date
+  completed_at: Date
 }
 
 extend type Query {
@@ -15,5 +16,5 @@ extend type Query {
 }
 
 extend type Mutation {
-  createComment(postId: ID!, content: String!): Comment
+  createComment(user_id: ID!, post_id: ID!, content: String!): Post
 }

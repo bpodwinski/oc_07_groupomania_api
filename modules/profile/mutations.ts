@@ -46,16 +46,6 @@ export const profileMutationsModule = createModule({
               gravatar: gravatar,
               password: args.password,
             },
-            select: {
-              id: true,
-              firstname: true,
-              lastname: true,
-              service: true,
-              email: true,
-              gravatar: true,
-              role: true,
-              posts: true,
-            },
           });
         }
       },

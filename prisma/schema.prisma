@@ -1,52 +1,49 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["nativeTypes"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DB_URL")
 }
 
-model comment {
-  id        Int       @id @default(autoincrement()) @db.Int
-  postId    Int       @db.Int
-  userId    Int       @db.Int
-  content   String    @db.LongText
-  createdAt DateTime? @default(now())
-  updatedAt DateTime?
-  post      post      @relation(fields: [postId], references: [id])
-  user      user      @relation(fields: [userId], references: [id])
-
-  @@index([postId], name: "postId")
-  @@index([userId], name: "userId")
+model user {
+  id           Int       @id @default(autoincrement())
+  firstname    String
+  lastname     String
+  email        String    @unique
+  password     String
+  gravatar     String
+  service      String
+  role         String
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @default(now())
+  completed_at DateTime?
+  comment      comment[]
+  post         post[]
 }
 
 model post {
-  id        Int       @id @default(autoincrement()) @db.Int
-  userId    Int       @db.Int
-  title     String    @db.VarChar(191)
-  content   String    @db.LongText
-  imgUrl    String?   @db.VarChar(191)
-  createdAt DateTime? @default(now())
-  updatedAt DateTime?
-  user      user      @relation(fields: [userId], references: [id])
-  comments  comment[]
-
-  @@index([userId], name: "userId")
+  id           Int       @id @default(autoincrement())
+  user_id      Int       @default(autoincrement())
+  title        String
+  content      String
+  img_url      String?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @default(now())
+  completed_at DateTime?
+  user         user      @relation(fields: [user_id], references: [id])
+  comment      comment[]
 }
 
-model user {
-  id        Int       @id @default(autoincrement()) @db.Int
-  firstname String    @db.VarChar(191)
-  lastname  String    @db.VarChar(191)
-  email     String    @unique @db.VarChar(191)
-  gravatar  String    @db.VarChar(191)
-  password  String    @db.VarChar(191)
-  service   String    @db.VarChar(191)
-  role      String    @db.VarChar(191)
-  createdAt DateTime? @default(now())
-  updatedAt DateTime?
-  comments  comment[]
-  posts     post[]
+model comment {
+  id           Int       @id @default(autoincrement())
+  user_id      Int       @default(autoincrement())
+  post_id      Int       @default(autoincrement())
+  content      String
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @default(now())
+  completed_at DateTime?
+  post         post      @relation(fields: [post_id], references: [id])
+  user         user      @relation(fields: [user_id], references: [id])
 }

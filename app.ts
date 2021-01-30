@@ -1,7 +1,8 @@
 import { createApplication } from "graphql-modules";
 
-import { authQueriesModule } from "./modules/auth/queries";
 import { authMutationsModule } from "./modules/auth/mutations";
+
+import { usersQueriesModule } from "./modules/users/queries";
 
 import { profileQueriesModule } from "./modules/profile/queries";
 import { profileMutationsModule } from "./modules/profile/mutations";
@@ -14,10 +15,10 @@ import { commentsMutationsModule } from "./modules/comments/mutations";
 
 export const app = createApplication({
   modules: [
-    authQueriesModule,
     authMutationsModule,
     profileQueriesModule,
     profileMutationsModule,
+    usersQueriesModule,
     postsQueriesModule,
     postsMutationsModule,
     commentsQueriesModule,

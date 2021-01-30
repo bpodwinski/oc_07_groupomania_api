@@ -21,8 +21,8 @@ export const commentsMutationsModule = createModule({
         if (userId) {
           return context.prisma.comment.create({
             data: {
-              userId: userId,
-              postId: args.postId,
+              user_id: userId,
+              post_id: args.postId,
               content: args.content,
             },
           });

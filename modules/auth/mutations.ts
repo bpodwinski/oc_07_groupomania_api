@@ -1,15 +1,21 @@
-import { signupUserDefinition, loginUserDefinition } from "./mutations.d";
-import "graphql-import-node";
+/**
+ * @author  Benoit Podwinski <me@benoitpodwinski.com>
+ */
+
 import { createModule } from "graphql-modules";
-import { Context } from "../../context";
+import "graphql-import-node";
 import { AuthenticationError } from "apollo-server";
-import * as userType from "./schema.graphql";
-import * as jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
 import * as md5 from "md5";
+import * as jwt from "jsonwebtoken";
+
+import { signupUserDefinition, loginUserDefinition } from "./mutations.d";
+import { Context } from "../../context";
+import * as userType from "./schema.graphql";
+import verifyPassword from "../../utils/password";
 
 export const authMutationsModule = createModule({
-  id: "authMutationsModule",
+  id: "AuthenticationMutation",
   dirname: __dirname,
   typeDefs: [userType],
   resolvers: {
@@ -19,11 +25,15 @@ export const authMutationsModule = createModule({
         args: signupUserDefinition,
         context: Context
       ) => {
-        const checkUser = await context.prisma.user.findUnique({
-          where: { email: args.email },
+        await verifyPassword(args.password);
+
+        const checkEmail = await context.prisma.user.findFirst({
+          where: {
+            email: args.email,
+          },
         });
 
-        if (checkUser !== null) {
+        if (checkEmail) {
           throw new AuthenticationError("User already exists");
         }
 
@@ -49,14 +59,14 @@ export const authMutationsModule = createModule({
         args: loginUserDefinition,
         context: Context
       ) => {
-        const user = await context.prisma.user.findUnique({
+        const user = await context.prisma.user.findFirst({
           where: {
             email: args.email,
           },
         });
 
         if (!user) {
-          return null;
+          throw new AuthenticationError("User not found");
         }
 
         if (bcrypt.compareSync(args.password, user.password)) {
@@ -64,10 +74,12 @@ export const authMutationsModule = createModule({
             { userId: user.id },
             process.env.TOKEN || "3P5DEkDn8yz0H9IgVU22",
             {
-              expiresIn: process.env.TOKEN_EXPIRES,
+              expiresIn: "1h",
             }
           );
           return { ...user, token };
+        } else {
+          throw new AuthenticationError("Password don't match");
         }
       },
     },

@@ -6,11 +6,10 @@ type Profile {
   email: String!
   gravatar: String!
   role: String!
-  posts: [Post]
 }
 
 extend type Query {
-  profile: Profile
+  profile(id: ID!): Profile
 }
 
 extend type Mutation {

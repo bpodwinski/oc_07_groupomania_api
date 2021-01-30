@@ -1,12 +1,13 @@
 type Post {
   id: ID!
-  userId: ID!
+  user_id: ID!
   title: String!
   content: String!
-  imgUrl: String
-  createdAt: Date!
-  updatedAt: Date
-  user: User!
+  img_url: String
+  user: User
+  created_at: Date!
+  updated_at: Date
+  completed_at: Date
 }
 
 extend type Query {
@@ -15,10 +16,5 @@ extend type Query {
 }
 
 extend type Mutation {
-  createPost(
-    userId: ID!
-    title: String!
-    content: String!
-    imgUrl: String
-  ): Post
+  createPost(title: String!, content: String!): Post
 }

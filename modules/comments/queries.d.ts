@@ -1,3 +1,3 @@
-export type commentsDefinition = {
+export type commentDefinition = {
   id: number;
 };

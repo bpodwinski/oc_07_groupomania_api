@@ -1,4 +1,4 @@
-import { commentsDefinition } from "./queries.d";
+import { commentDefinition } from "./queries.d";
 import "graphql-import-node";
 import { createModule } from "graphql-modules";
 import { Context } from "../../context";
@@ -10,85 +10,29 @@ export const commentsQueriesModule = createModule({
   typeDefs: [commentType],
   resolvers: {
     Query: {
-      comments: async (
-        parent: any,
-        args: commentsDefinition,
-        context: Context
-      ) => {
-        return await context.prisma.comment.findMany({
-          orderBy: {
-            createdAt: "desc",
-          },
-          select: {
-            id: true,
-            postId: true,
-            userId: true,
-            content: true,
-            createdAt: true,
-            updatedAt: true,
-            user: {
-              select: {
-                id: true,
-                firstname: true,
-                lastname: true,
-                service: true,
-                email: true,
-                gravatar: true,
-                createdAt: true,
-                updatedAt: true,
-              },
-            },
-            post: {
-              select: {
-                id: true,
-                title: true,
-                content: true,
-                imgUrl: true,
-                createdAt: true,
-                updatedAt: true,
-              },
-            },
-          },
-        });
-      },
       comment: async (
         parent: any,
-        args: commentsDefinition,
+        args: commentDefinition,
         context: Context
       ) => {
         return await context.prisma.comment.findUnique({
           where: {
-            id: args.id,
+            id: Number(args.id),
           },
-          select: {
-            id: true,
-            postId: true,
-            userId: true,
-            content: true,
-            createdAt: true,
-            updatedAt: true,
-            user: {
-              select: {
-                id: true,
-                firstname: true,
-                lastname: true,
-                service: true,
-                email: true,
-                gravatar: true,
-                createdAt: true,
-                updatedAt: true,
-              },
-            },
-            post: {
-              select: {
-                id: true,
-                title: true,
-                content: true,
-                imgUrl: true,
-                createdAt: true,
-                updatedAt: true,
-              },
-            },
+          include: {
+            user: true,
+            post: true,
+          },
+        });
+      },
+      comments: async (parent: any, args: any, context: Context) => {
+        return await context.prisma.comment.findMany({
+          orderBy: {
+            created_at: "desc",
+          },
+          include: {
+            user: true,
+            post: true,
           },
         });
       },

@@ -1,3 +1,7 @@
+/**
+ * @author  Benoit Podwinski <me@benoitpodwinski.com>
+ */
+
 import { createPostDefinition } from "./mutations.d";
 import "graphql-import-node";
 import { createModule } from "graphql-modules";
@@ -21,7 +25,7 @@ export const postsMutationsModule = createModule({
         if (userId) {
           return context.prisma.post.create({
             data: {
-              userId: userId,
+              user_id: userId,
               title: args.title,
               content: args.content,
             },

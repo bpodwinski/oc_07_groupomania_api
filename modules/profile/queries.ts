@@ -17,27 +17,7 @@ export const profileQueriesModule = createModule({
       ) => {
         return await context.prisma.user.findUnique({
           where: {
-            id: args.id,
-          },
-          select: {
-            id: true,
-            firstname: true,
-            lastname: true,
-            service: true,
-            email: true,
-            gravatar: true,
-            createdAt: true,
-            updatedAt: true,
-            posts: {
-              select: {
-                id: true,
-                title: true,
-                content: true,
-                imgUrl: true,
-                createdAt: true,
-                updatedAt: true,
-              },
-            },
+            id: Number(args.id),
           },
         });
       },

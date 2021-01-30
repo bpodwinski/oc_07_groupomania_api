@@ -1,10 +1,5 @@
 scalar Date
 
-type Login {
-  id: ID
-  token: String
-}
-
 type User {
   id: ID!
   firstname: String!
@@ -13,11 +8,15 @@ type User {
   email: String!
   gravatar: String!
   role: String!
-  posts: [Post]
+  post: [Post]
+  created_at: Date!
+  updated_at: Date
+  completed_at: Date
 }
 
-type Query {
-  users: [User]
+type Login {
+  id: ID
+  token: String
 }
 
 type Mutation {
