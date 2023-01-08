@@ -16,7 +16,7 @@ export default class Auth {
       res.locals.jwtPayload = jwtPayload;
 
       next();
-    } catch (error) {
+    } catch (error: any) {
       next(new AuthError(error.message));
     }
   }

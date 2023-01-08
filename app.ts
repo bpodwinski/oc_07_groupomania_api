@@ -8,7 +8,7 @@ import * as path from "path";
 
 export default class App {
   public app: express.Application;
-  public cache: void;
+  //public cache: void;
   public host: string;
   public port: number;
   public db_name: string;
