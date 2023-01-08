@@ -13,6 +13,7 @@ export default class App {
   public port: number;
   public db_name: string;
   public db_host: string;
+  public db_port: number;
   public db_user: string;
   public db_pass: string;
   public redis_db: string | undefined;
@@ -28,6 +29,7 @@ export default class App {
     port: number;
     db_name: string;
     db_host: string;
+    db_port: number;
     db_user: string;
     db_pass: string;
     redis_db: string | undefined;
@@ -45,6 +47,7 @@ export default class App {
     this.port = appInit.port;
     this.db_name = appInit.db_name;
     this.db_host = appInit.db_host;
+    this.db_port = appInit.db_port;
     this.db_user = appInit.db_user;
     this.db_pass = appInit.db_pass;
     this.redis_db = appInit.redis_db;
@@ -95,6 +98,7 @@ export default class App {
     const sequelize = new Sequelize({
       database: this.db_name,
       host: this.db_host,
+      port: this.db_port,
       username: this.db_user,
       password: this.db_pass,
       dialect: "mysql",
